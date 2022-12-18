@@ -36,3 +36,4 @@ runIfExpired <- function(storeName, f, maxage=hours(0)) {
     return(retrieveRDS(storeName, basepath))
   runAndArchive()
 }
+

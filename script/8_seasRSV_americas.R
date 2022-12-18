@@ -19,7 +19,7 @@ print(
 rsv_amer %>%
   arrange(date, country) %>%
   group_by(date = round_date(date, "month"), country) %>%
-  summarise(cases = mean(cases)) %>%
+  summarise(cases = sum(cases)) %>%
   ggplot(aes(x = date, y = cases)) +
   geom_line() + 
   facet_wrap(. ~ country, scales = "free_y") +

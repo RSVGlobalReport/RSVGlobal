@@ -19,7 +19,7 @@ print(
 rsv_asmw %>%
   arrange(date, country) %>%
   group_by(date = round_date(date, "month"), country) %>%
-  summarise(cases = mean(cases)) %>%
+  summarise(cases = sum(cases, na.rm = TRUE)) %>%
   ggplot(aes(x = date, y = cases)) +
   geom_line() + 
   facet_wrap(. ~ country, scales = "free_y") +
@@ -39,7 +39,7 @@ rsv_asmw %>%
   summarise(mcases = mean(cases, rm.na = TRUE)) %>%
   ungroup() %>%
   group_by(perioda, country) %>%
-  mutate(pcases = mcases/sum(mcases)) %>%
+  mutate(pcases = mcases/sum(mcases, na.rm = TRUE)) %>%
   
   ggplot(aes(x = mont, y = pcases, group = perioda, color = perioda)) +
   geom_line(size = 1) + 
