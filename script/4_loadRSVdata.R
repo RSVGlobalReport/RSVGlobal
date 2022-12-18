@@ -28,5 +28,6 @@ rsvds <-
                 yr = lubridate::year(date),
                 sentin = factor(sentin),
                 hemi = factor(hemi),
-                fluseas = factor(fluseas))
+                fluseas = factor(fluseas)) 
   
+  readr::write_csv(x = rsvds, file = here("data", "RSVglobal.csv"))
