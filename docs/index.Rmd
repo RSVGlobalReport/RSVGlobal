@@ -51,7 +51,7 @@ source(here("script", "4_loadRSVdata.R"))
 
 &nbsp;
 
-### Seasonal dynamics of RSV by region
+### Dynamics of RSV by region
 
 ```{r PlotRSV1, message = FALSE, warning = FALSE, fig.width = 12, fig.height = 6, fig.align = 'center'}
 
@@ -61,7 +61,7 @@ source(here("script", "5_seasRSV_region.R"))
 
 &nbsp;
 
-### Seasonal dynamics of RSV in African, South East Asia, Western Pacific and Middle East countries
+### Dynamics of RSV in African, South East Asia, Western Pacific and Middle East countries
 
 ```{r PlotRSV2, message = FALSE, warning = FALSE, fig.width = 14, fig.height = 7, fig.align = 'center'}
 
@@ -71,7 +71,7 @@ source(here("script", "6_seasRSV_asmw.R"))
 
 &nbsp;
 
-### Seasonal dynamics of RSV in European countries
+### Dynamics of RSV in European countries
 
 ```{r PlotRSV3, message = FALSE, warning = FALSE, fig.width = 14, fig.height = 7, fig.align = 'center'}
 
@@ -81,7 +81,7 @@ source(here("script", "7_seasRSV_europe.R"))
 
 &nbsp;
 
-### Seasonal dynamics of RSV in Americas countries
+### Dynamics of RSV in Americas countries
 
 ```{r PlotRSV4, message = FALSE, warning = FALSE, fig.width = 14, fig.height = 7, fig.align = 'center'}
 
