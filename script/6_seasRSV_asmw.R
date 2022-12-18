@@ -29,26 +29,33 @@ rsv_asmw %>%
 
 #seasonal RSV dynamics before and after COVID-19 in Africa/SEAR/ME/WPR
 print(
-rsv_asmw %>%
-  mutate(perioda = if_else(date < "2020-01-01", "PreCOVID-19", 
+  rsv_asmw %>%
+    mutate(covid = if_else(date < "2020-01-01", "PreCOVID-19", 
                            if_else(date >= "2021-01-01" , "PostCOVID-19", NA_character_)),
-         mont = month(date, label = TRUE, abbr = TRUE)) %>%
-  filter(!is.na(perioda)) %>%
-  arrange(date, country) %>%
-  group_by(perioda, country, mont) %>%
-  summarise(mcases = mean(cases, rm.na = TRUE)) %>%
-  ungroup() %>%
-  group_by(perioda, country) %>%
-  mutate(pcases = mcases/sum(mcases, na.rm = TRUE)) %>%
-  
-  ggplot(aes(x = mont, y = pcases, group = perioda, color = perioda)) +
-  geom_line(size = 1) + 
-  scale_y_continuous(breaks = seq(0, 1, 0.10), labels = scales::percent_format(accuracy = 1)) +
-  facet_wrap(. ~ country, scales = "free_y") +
-  theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
-  theme(axis.text.x = element_text(angle = 40, vjust = 0.5, hjust = 0.3)) +
-  labs(title = "Seasonal dynamics of RSV cases in Africa/SEAR/ME/WPR", x = "Months", y = "RSV cases (%)") + 
-  theme(legend.position = "bottom") +
-  guides(color = guide_legend(title = "Reporting period"))
+           mon = month(date, label = TRUE, abbr = TRUE)) %>%
+    filter(!is.na(covid)) %>%
+    arrange(date, country) %>%
+    
+    group_by(date = round_date(date, "month"), mon, country, covid) %>%
+    summarise(cases = sum(cases, na.rm = TRUE)) %>% #sum up weekly cases to monthly for each year
+    ungroup() %>%
+    
+    group_by(covid, country, mon) %>%
+    summarise(mcases = mean(cases, rm.na = TRUE)) %>% #average monthly cases across years
+    ungroup() %>%
+    
+    group_by(covid, country) %>%
+    mutate(pcases = mcases/sum(mcases, na.rm = TRUE)) %>% #compute share of averaged cases in each month
+    ungroup() %>%
+    
+    ggplot(aes(x = mon, y = pcases, group = covid, color = covid)) +
+    geom_line(size = 1) + 
+    scale_y_continuous(breaks = seq(0, 1, 0.10), labels = scales::percent_format(accuracy = 1)) +
+    facet_wrap(. ~ country, scales = "free_y") +
+    theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
+    theme(axis.text.x = element_text(angle = 40, vjust = 0.5, hjust = 0.3)) +
+    labs(title = "Seasonal dynamics of RSV cases in Africa/SEAR/ME/WPR", x = "Months", y = "RSV cases (%)") + 
+    theme(legend.position = "bottom") +
+    guides(color = guide_legend(title = "Reporting period"))
 )
 
