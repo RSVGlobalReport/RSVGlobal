@@ -93,7 +93,7 @@ source(here("script", "8_seasRSV_americas.R"))
 
 ### Timing of the peak RSV cases globally
 
-```{r PlotRSV5, message = FALSE, warning = FALSE, fig.width = 12, fig.height = 7, fig.align = 'center'}
+```{r PlotRSV5, message = FALSE, warning = FALSE, fig.width = 12, fig.height = 5, fig.align = 'center'}
 
 source(here("script", "9_peakTimingRSV.R"))
 
