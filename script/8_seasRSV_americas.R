@@ -58,3 +58,33 @@ print(
     theme(legend.position = "bottom") +
     guides(color = guide_legend(title = "Reporting period"))
 )
+
+#====================================================================
+
+#seasonal RSV dynamics before and after COVID-19 by regions for each year
+print(
+  rsv_amer %>%
+    mutate(covid = if_else(date < "2020-01-01", "PreCOVID-19", 
+                           if_else(date >= "2021-01-01" , "PostCOVID-19", "DurCOVID-19")),
+           mon = month(date, label = TRUE, abbr = TRUE)) %>%
+    filter(!is.na(covid), yr >= 2018) %>%
+    arrange(date, country) %>%
+    
+    group_by(country, yr, date = round_date(date, "month"), mon, covid) %>%
+    summarise(cases = sum(cases, na.rm = TRUE)) %>% #sum up weekly cases to monthly for each year
+    ungroup() %>%
+    
+    group_by(country, yr, covid) %>%
+    mutate(pcases = cases/sum(cases, na.rm = TRUE)) %>% #compute share of averaged cases in each month
+    ungroup() %>%
+    
+    ggplot(aes(x = mon, y = pcases, group = yr, color = factor(yr))) +
+    geom_line(size = 1) + 
+    scale_y_continuous(breaks = seq(0, 1, 0.10), labels = scales::percent_format(accuracy = 1)) +
+    facet_wrap(. ~ country, scales = "free_y") +
+    theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
+    theme(axis.text.x = element_text(angle = 40, vjust = 0.5, hjust = 0.3)) +
+    labs(title = "Seasonal dynamics of RSV cases in Americas in each year", x = "Months", y = "RSV cases (%)") + 
+    theme(legend.position = c(0.85, 0), legend.justification = c(1, 0)) +
+    guides(color = guide_legend(title = "Reporting period"))
+)

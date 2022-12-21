@@ -27,7 +27,7 @@ print(
     
     ggplot(aes(x = mon, y = pcases, group = covid, color = covid)) +
     geom_line(size = 1) + 
-    coord_polar() +
+    coord_polar(clip = "off") +
     scale_y_continuous(breaks = seq(0, 1, 0.05), labels = scales::percent_format(accuracy = 1)) +
     facet_wrap(. ~ region) +
     theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
@@ -35,7 +35,8 @@ print(
     theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) + 
     labs(title = "Timing of the peak RSV cases by region", x = "", y = "") + 
     theme(legend.position = "bottom") +
-    guides(color = guide_legend(title = "Reporting period"))
+    guides(color = guide_legend(title = "Reporting period")) +
+    theme(aspect.ratio = 1)
 )
 
 
@@ -63,7 +64,7 @@ print(
     
     ggplot(aes(x = mon, y = pcases, group = covid, color = covid)) +
     geom_line(size = 1) + 
-    coord_polar() +
+    coord_polar(clip = "off") +
     scale_y_continuous(breaks = seq(0, 1, 0.05), labels = scales::percent_format(accuracy = 1)) +
     facet_wrap(. ~ country) +
     theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
@@ -71,7 +72,8 @@ print(
     theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) + 
     labs(title = "Timing of the peak RSV cases in Africa/SEAR/ME/WPR countries", x = "", y = "") + 
     theme(legend.position = "bottom") +
-    guides(color = guide_legend(title = "Reporting period"))
+    guides(color = guide_legend(title = "Reporting period")) +
+    theme(aspect.ratio = 1)
 )
 
 
@@ -98,7 +100,7 @@ print(
     
     ggplot(aes(x = mon, y = pcases, group = covid, color = covid)) +
     geom_line(size = 1) + 
-    coord_polar() +
+    coord_polar(clip = "off") +
     scale_y_continuous(breaks = seq(0, 1, 0.05), labels = scales::percent_format(accuracy = 1)) +
     facet_wrap(. ~ country) +
     theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
@@ -106,7 +108,8 @@ print(
     theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) + 
     labs(title = "Timing of the peak RSV cases in European countries", x = "", y = "") + 
     theme(legend.position = "bottom") +
-    guides(color = guide_legend(title = "Reporting period"))
+    guides(color = guide_legend(title = "Reporting period")) +
+    theme(aspect.ratio = 1)
 )
 
 
@@ -133,7 +136,7 @@ print(
     
     ggplot(aes(x = mon, y = pcases, group = covid, color = covid)) +
     geom_line(size = 1) + 
-    coord_polar() +
+    coord_polar(clip = "off") +
     scale_y_continuous(breaks = seq(0, 1, 0.05), labels = scales::percent_format(accuracy = 1)) +
     facet_wrap(. ~ country) +
     theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
@@ -141,10 +144,31 @@ print(
     theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) + 
     labs(title = "Timing of the peak RSV cases in Americas countries", x = "", y = "") + 
     theme(legend.position = "bottom") +
-    guides(color = guide_legend(title = "Reporting period"))
+    guides(color = guide_legend(title = "Reporting period")) +
+    theme(aspect.ratio = 1)
 )
 
 
 #expand the time series by the number of cases
 #type.convert(as.is = TRUE) %>%
 #uncount(cases) %>%
+
+rsv_incid <-
+rsv_regn %>%
+  mutate(covid = if_else(date < "2020-01-01", "PreCOVID-19", 
+                         if_else(date >= "2021-01-01" , "PostCOVID-19", NA_character_)),
+         mon = month(date, label = TRUE, abbr = TRUE)) %>%
+  filter(!is.na(covid)) %>%
+  arrange(date, region) %>%
+  
+  group_by(date = round_date(date, "month"), mon, region, covid) %>%
+  summarise(cases = sum(cases, na.rm = TRUE)) %>% #sum up weekly cases to monthly for each year
+  ungroup()
+  
+  # group_by(covid, region, mon) %>%
+  # summarise(mcases = mean(cases, rm.na = TRUE)) %>% #average monthly cases across years
+  # ungroup()
+
+
+
+

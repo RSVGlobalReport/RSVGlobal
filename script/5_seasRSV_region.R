@@ -23,7 +23,7 @@ rsv_asmw %>%
 rsv_asmw <- rsv_asmw %>% 
   dplyr::distinct(country, date, .keep_all = TRUE)
 
-#---------------------------------------------------------------
+#====================================================================
 
 #filter to only have these countries included from Europe
 rsv_euro <- rsvds %>%
@@ -50,7 +50,7 @@ rsv_euro %>%
 rsv_euro <- rsv_euro %>% 
   dplyr::distinct(country, date, .keep_all = TRUE)
 
-#---------------------------------------------------------------
+#====================================================================
 
 # filter to only have these countries included from Americas
 rsv_amer <- rsvds %>%
@@ -105,23 +105,27 @@ rsv_regn %>%
   geom_line() + 
   facet_wrap(. ~ region, scales = "free_y") +
   theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
-  labs(title = "Weekly RSV cases by region", x = "MMWR Date", y = "RSV cases")
+  labs(title = "Weekly RSV cases by region across different years", x = "MMWR Date", y = "RSV cases")
 )
+
+#====================================================================
 
 #year on year monthly RSV cases by regions
 print(
 rsv_regn %>%
   arrange(date, region) %>%
-  group_by(date = round_date(date, "month"), region) %>%
+  group_by(region, date = round_date(date, "month")) %>%
   summarise(cases = sum(cases, na.rm = TRUE)) %>%
   ggplot(aes(x = date, y = cases)) +
   geom_line() + 
   facet_wrap(. ~ region, scales = "free_y") +
   theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
-  labs(title = "Monthly RSV cases by region", x = "MMWR Date", y = "RSV cases")
+  labs(title = "Monthly RSV cases by region across different years", x = "MMWR Date", y = "RSV cases")
 )
 
-#seasonal RSV dynamics before and after COVID-19 by regions
+#====================================================================
+
+#seasonal RSV dynamics before and after COVID-19 by regions aggreagate across all years
 print(
 rsv_regn %>%
   mutate(covid = if_else(date < "2020-01-01", "PreCOVID-19", 
@@ -130,15 +134,15 @@ rsv_regn %>%
   filter(!is.na(covid)) %>%
   arrange(date, region) %>%
   
-  group_by(date = round_date(date, "month"), mon, region, covid) %>%
+  group_by(region, date = round_date(date, "month"), mon, covid) %>%
   summarise(cases = sum(cases, na.rm = TRUE)) %>% #sum up weekly cases to monthly for each year
   ungroup() %>%
   
-  group_by(covid, region, mon) %>%
+  group_by(region, mon, covid) %>%
   summarise(mcases = mean(cases, rm.na = TRUE)) %>% #average monthly cases across years
   ungroup() %>%
   
-  group_by(covid, region) %>%
+  group_by(region, covid) %>%
   mutate(pcases = mcases/sum(mcases, na.rm = TRUE)) %>% #compute share of averaged cases in each month
   ungroup() %>%
   
@@ -148,7 +152,37 @@ rsv_regn %>%
   facet_wrap(. ~ region, scales = "free_y") +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
   theme(axis.text.x = element_text(angle = 40, vjust = 0.5, hjust = 0.3)) +
-  labs(title = "Seasonal dynamics of RSV cases by region", x = "Months", y = "RSV cases (%)") + 
-  theme(legend.position = "bottom") +
+  labs(title = "Seasonal dynamics of aggregated RSV cases across years by region", x = "Months", y = "RSV cases (%)") + 
+  theme(legend.position = c(0.9, 0.1), legend.justification = c(1, 0)) +
   guides(color = guide_legend(title = "Reporting period"))
+)
+
+#====================================================================
+
+#seasonal RSV dynamics before and after COVID-19 by regions for each year
+print(
+  rsv_regn %>%
+    mutate(covid = if_else(date < "2020-01-01", "PreCOVID-19", 
+                           if_else(date >= "2021-01-01" , "PostCOVID-19", "DurCOVID-19")),
+           mon = month(date, label = TRUE, abbr = TRUE)) %>%
+    filter(!is.na(covid), yr >= 2018) %>%
+    arrange(date, region) %>%
+    
+    group_by(region, yr, date = round_date(date, "month"), mon, covid) %>%
+    summarise(cases = sum(cases, na.rm = TRUE)) %>% #sum up weekly cases to monthly for each year
+    ungroup() %>%
+    
+    group_by(region, yr, covid) %>%
+    mutate(pcases = cases/sum(cases, na.rm = TRUE)) %>% #compute share of averaged cases in each month
+    ungroup() %>%
+    
+    ggplot(aes(x = mon, y = pcases, group = yr, color = factor(yr))) +
+    geom_line(size = 1) + 
+    scale_y_continuous(breaks = seq(0, 1, 0.05), labels = scales::percent_format(accuracy = 1)) +
+    facet_wrap(. ~ region, scales = "free_y") +
+    theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
+    theme(axis.text.x = element_text(angle = 40, vjust = 0.5, hjust = 0.3)) +
+    labs(title = "Seasonal dynamics of RSV cases by region in each year", x = "Months", y = "RSV cases (%)") + 
+    theme(legend.position = c(0.9, 0.1), legend.justification = c(1, 0)) +
+    guides(color = guide_legend(title = "Reporting period"))
 )
