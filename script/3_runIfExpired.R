@@ -1,10 +1,10 @@
-#By Deus Thindwa
+#Copied from Dan Weinberger's archiving code
 #18/11/2022
 #global reemergence of RSV onset, duration and peak
 
 #====================================================================
 
-#From Dan Weinberger (archiving)
+
 
 # Using ExcessILI's data archiving functions, returns the most recent copy of
 # output obtained by running a function or formula \code{f}, unless this 

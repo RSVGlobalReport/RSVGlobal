@@ -1,6 +1,6 @@
 ---
 title: Understanding the patterns of global re-emergence of RSV following COVID19 pandemic
-author: "Deus Thindwa"
+author: "Deus & Dan"
 date: "01/12/2022"
 output:
   html_document: default
@@ -73,7 +73,7 @@ source(here("script", "6_seasRSV_asmw.R"))
 
 ### Dynamics of RSV in European countries
 
-```{r PlotRSV3, message = FALSE, warning = FALSE, fig.width = 14, fig.height = 7, fig.align = 'center'}
+```{r PlotRSV3, message = FALSE, warning = FALSE, fig.width = 14, fig.height = 9, fig.align = 'center'}
 
 source(here("script", "7_seasRSV_europe.R"))
 
