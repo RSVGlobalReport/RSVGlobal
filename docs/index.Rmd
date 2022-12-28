@@ -53,7 +53,7 @@ source(here("script", "4_loadRSVdata.R"))
 
 ### Dynamics of RSV by region
 
-```{r PlotRSV1, message = FALSE, warning = FALSE, fig.width = 12, fig.height = 6, fig.align = 'center'}
+```{r PlotRSV1, message = FALSE, warning = FALSE, fig.width = 13, fig.height = 6, fig.align = 'center'}
 
 source(here("script", "5_seasRSV_region.R"))
 
@@ -63,7 +63,7 @@ source(here("script", "5_seasRSV_region.R"))
 
 ### Dynamics of RSV in African, South East Asia, Western Pacific and Middle East countries
 
-```{r PlotRSV2, message = FALSE, warning = FALSE, fig.width = 14, fig.height = 7, fig.align = 'center'}
+```{r PlotRSV2, message = FALSE, warning = FALSE, fig.width = 15, fig.height = 7, fig.align = 'center'}
 
 source(here("script", "6_seasRSV_asmw.R"))
 
@@ -73,7 +73,7 @@ source(here("script", "6_seasRSV_asmw.R"))
 
 ### Dynamics of RSV in European countries
 
-```{r PlotRSV3, message = FALSE, warning = FALSE, fig.width = 14, fig.height = 9, fig.align = 'center'}
+```{r PlotRSV3, message = FALSE, warning = FALSE, fig.width = 15, fig.height = 9, fig.align = 'center'}
 
 source(here("script", "7_seasRSV_europe.R"))
 
@@ -83,7 +83,7 @@ source(here("script", "7_seasRSV_europe.R"))
 
 ### Dynamics of RSV in Americas countries
 
-```{r PlotRSV4, message = FALSE, warning = FALSE, fig.width = 14, fig.height = 7, fig.align = 'center'}
+```{r PlotRSV4, message = FALSE, warning = FALSE, fig.width = 15, fig.height = 7, fig.align = 'center'}
 
 source(here("script", "8_seasRSV_americas.R"))
 
