@@ -11,7 +11,7 @@ print(
 rsv_amer %>%
   ggplot(aes(x = date, y = cases)) +
   geom_line() + 
-  facet_wrap(. ~ country, scales = "free_y") +
+  facet_wrap(. ~ country, ncol = 3, scales = "free_y") +
   theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
   theme(strip.background = element_rect(fill = "light green")) +
   labs(title = "Weekly RSV cases in Americas countries, 2018-2022", x = "Date", y = "RSV cases")
@@ -28,12 +28,12 @@ print(
     
     ggplot(aes(x = wk, y = cases, group = yr, color = factor(yr))) +
     geom_line(size = 1) + 
-    scale_x_continuous(breaks = seq(1, 52, 3)) +
-    facet_wrap(. ~ country, scales = "free_y") +
+    scale_x_continuous(breaks = seq(1, 52, 4)) +
+    facet_wrap(. ~ country, ncol = 3, scales = "free_y") +
     theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
     theme(axis.text.x = element_text(angle = 40, vjust = 0.5, hjust = 0.3)) +
     labs(title = "Weekly seasonal dynamics of RSV cases by Americas country & year", x = "Week (Jan-Dec)", y = "RSV cases") + 
-    theme(legend.position = c(0.90, 0.02), legend.justification = c(1, 0), strip.background = element_rect(fill = "light green")) +
+    theme(legend.position = "bottom", strip.background = element_rect(fill = "light green")) +
     guides(color = guide_legend(title = ""))
 )
 
@@ -50,12 +50,12 @@ print(
 
     ggplot(aes(x = wk, y = mcases, group = covid, color = covid)) +
     geom_line(size = 1) + 
-    scale_x_continuous(breaks = seq(1, 52, 3)) +
-    facet_wrap(. ~ country, scales = "free_y") +
+    scale_x_continuous(breaks = seq(1, 52, 4)) +
+    facet_wrap(. ~ country, ncol = 3, scales = "free_y") +
     theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
     theme(axis.text.x = element_text(angle = 40, vjust = 0.5, hjust = 0.3)) +
     labs(title = "Weekly seasonal dynamics of RSV cases by Americas country & COVID-19 phase", x = "Week (Jan-Dec)", y = "RSV cases") + 
-    theme(legend.position = c(0.90, 0.03), legend.justification = c(1, 0), strip.background = element_rect(fill = "light green")) +
+    theme(legend.position = "bottom", strip.background = element_rect(fill = "light green")) +
     guides(color = guide_legend(title = "Reporting period"))
 )
 
@@ -70,7 +70,7 @@ rsv_amer %>%
   summarise(cases = sum(cases)) %>%
   ggplot(aes(x = date, y = cases)) +
   geom_line() + 
-  facet_wrap(. ~ country, scales = "free_y") +
+  facet_wrap(. ~ country, ncol = 3, scales = "free_y") +
   theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
   theme(strip.background = element_rect(fill = "light green")) +
   labs(title = "Monthly RSV cases in Americas countries, 2018-2022", x = "Date", y = "RSV cases")
@@ -87,11 +87,11 @@ print(
     
     ggplot(aes(x = mon, y = cases, group = yr, color = factor(yr))) +
     geom_line(size = 1) + 
-    facet_wrap(. ~ country, scales = "free_y") +
+    facet_wrap(. ~ country, ncol = 3, scales = "free_y") +
     theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
     theme(axis.text.x = element_text(angle = 40, vjust = 0.5, hjust = 0.3)) +
     labs(title = "Monthly seasonal dynamics of RSV cases by Americas country & year", x = "Month", y = "RSV cases") + 
-    theme(legend.position = c(0.85, 0), legend.justification = c(1, 0), strip.background = element_rect(fill = "light green")) +
+    theme(legend.position = "bottom", strip.background = element_rect(fill = "light green")) +
     guides(color = guide_legend(title = ""))
 )
 
@@ -111,10 +111,10 @@ print(
     
     ggplot(aes(x = mon, y = mcases, group = covid, color = covid)) +
     geom_line(size = 1) + 
-    facet_wrap(. ~ country, scales = "free_y") +
+    facet_wrap(. ~ country, ncol = 3, scales = "free_y") +
     theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
     theme(axis.text.x = element_text(angle = 40, vjust = 0.5, hjust = 0.3)) +
     labs(title = "Monthly seasonal dynamics of RSV cases by Americas country & COVID-19 phase", x = "Month", y = "RSV cases") + 
-    theme(legend.position = c(0.90, 0), legend.justification = c(1, 0), strip.background = element_rect(fill = "light green")) +
+    theme(legend.position = "bottom", strip.background = element_rect(fill = "light green")) +
     guides(color = guide_legend(title = "Reporting period"))
 )

@@ -92,7 +92,7 @@ print(
     theme(axis.text.x = element_text(angle = 40, vjust = 0.5, hjust = 0.3)) +
     theme(axis.title.y = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank()) + 
     labs(title = "Monthly timing of the peak RSV cases by European country & COVID-19 phase", x = "", y = "") + 
-    theme(legend.position = "bottom", strip.background = element_rect(fill = "orange")) +
+    theme(legend.position =  c(0.90, 0.05), legend.justification = c(1, 0), strip.background = element_rect(fill = "orange")) +
     guides(color = guide_legend(title = "Reporting period")) +
     theme(aspect.ratio = 1)
 )

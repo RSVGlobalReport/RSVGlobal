@@ -100,7 +100,7 @@ rsv_euro <-
   dplyr::filter(country %in% c("France", "Germany", "Netherlands", "Spain", "Portugal", "Iceland",
                                "Ireland", "Denmark", "Finland", "Sweden", "United Kingdom, England", 
                                "United Kingdom, Northern Ireland", "United Kingdom, Scotland",
-                               "Bulgaria", "Belarus", "Russian Federation", "Hungary", "Poland", "Slovakia"),
+                               "Bulgaria", "Russian Federation", "Hungary", "Poland", "Slovakia"),
                 yr >= 2018) %>%
   dplyr::mutate(country = if_else(country == "United Kingdom, Northern Ireland", "NIreland",
                                   if_else(country == "United Kingdom, Scotland", "Scotland",

@@ -11,7 +11,7 @@ print(
 rsv_regn %>%
   ggplot(aes(x = date, y = cases)) +
   geom_line() + 
-  facet_wrap(. ~ region, ncol = 1, scales = "free_y") +
+  facet_wrap(. ~ region, scales = "free_y") +
   theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
   theme(strip.background = element_rect(fill = "light yellow")) +
   labs(title = "Weekly RSV cases by region, 2018-2022", x = "Date", y = "RSV cases")
@@ -69,7 +69,7 @@ rsv_regn %>%
   summarise(cases = sum(cases, na.rm = TRUE)) %>%
   ggplot(aes(x = date, y = cases)) +
   geom_line() + 
-  facet_wrap(. ~ region, ncol = 1, scales = "free_y") +
+  facet_wrap(. ~ region, scales = "free_y") +
   theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
   theme(strip.background = element_rect(fill = "light yellow")) +
   labs(title = "Monthly RSV cases by region, 2018-2022", x = "Date", y = "RSV cases")
