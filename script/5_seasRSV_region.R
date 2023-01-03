@@ -21,7 +21,7 @@ rsv_regn %>%
   theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
   theme(strip.background = element_rect(fill = "light yellow")) +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-  labs(title = "14-days rolling average RSV cases by WHO region, 2017-2022 (*see countries included)", x = "Date", y = "RSV cases")
+  labs(title = "14-days rolling average RSV cases, 2017-2022 (*see countries included)", subtitle = "(Stratified by WHO region)", x = "Date", y = "RSV cases")
 )
 
 #====================================================================
@@ -58,7 +58,7 @@ p1 <-
   ggplot(aes(x = wk, y = cases, group = yr, color = factor(yr))) +
   geom_line(size = 1) +
   facet_wrap(. ~ region, ncol = 1, scales = "free_y") +
-  labs(title = "Weekly seasonal RSV cases by WHO region, year", x = "Week", y = "RSV cases")  +
+  labs(title = "Weekly seasonal RSV cases", subtitle = "(Stratified by WHO region & year)", x = "Week", y = "RSV cases")  +
   guides(color = guide_legend(title = "")) +
   scale_x_continuous(breaks = seq(1, 52, 4)) +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
@@ -116,7 +116,7 @@ q1 <-
   facet_wrap(. ~ region, ncol = 1, scales = "free_y") +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-  labs(title = "RSV cases by region, COVID-19 phase", x = "Week", y = "RSV cases") + 
+  labs(title = "Weekly seasonal RSV cases", subtitle = "(Stratified by WHO region & Covid-19 phase)", x = "Week", y = "RSV cases") + 
   theme(legend.position = "none", strip.background = element_rect(fill = "light yellow")) +
   guides(color = guide_legend(title = ""))
 
