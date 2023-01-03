@@ -51,9 +51,9 @@ source(here("script", "4_loadRSVdata.R"))
 
 &nbsp;
 
-### Dynamics of RSV by region
+### Dynamics of RSV by WHO region
 
-```{r PlotRSV1, message = FALSE, warning = FALSE, fig.width = 13, fig.height = 8, fig.align = 'center'}
+```{r PlotRSV1, message = FALSE, warning = FALSE, fig.width = 15, fig.height = 6, fig.align = 'center'}
 
 source(here("script", "5_seasRSV_region.R"))
 

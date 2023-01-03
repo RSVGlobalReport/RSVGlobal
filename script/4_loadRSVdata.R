@@ -62,8 +62,8 @@ rsv_asmw <-
   dplyr::filter(country %in% c("Cameroon", "Central African Republic", "Côte d'Ivoire", "Madagascar", "South Africa", #African
                                "India", #South East Asia
                                "Australia", "Japan", "Mongolia", "Malaysia", # Western pacific
-                               "Oman", "Qatar"), #Middle East
-                yr >= 2018) 
+                               "Oman", "Qatar"), #Eastern Mediterrenean
+                yr >= 2017)
 
 #'Not defined' may include sentinel or non-sentinel data
 #'properly index by week to have 0 or some observed number of cases in sequential weeks
@@ -101,7 +101,7 @@ rsv_euro <-
                                "Ireland", "Denmark", "Finland", "Sweden", "United Kingdom, England", 
                                "United Kingdom, Northern Ireland", "United Kingdom, Scotland",
                                "Bulgaria", "Russian Federation", "Hungary", "Poland", "Slovakia"),
-                yr >= 2018) %>%
+                yr >= 2017) %>%
   dplyr::mutate(country = if_else(country == "United Kingdom, Northern Ireland", "NIreland",
                                   if_else(country == "United Kingdom, Scotland", "Scotland",
                                           if_else(country == "United Kingdom, England", "England",
@@ -146,7 +146,7 @@ rsv_amer <-
   dplyr::filter(country %in% c("Argentina", "Belize", "Bolivia (Plurinational State of)", "Brazil", "Canada", "Colombia", "Costa Rica",
                                "Dominican Republic", "Ecuador", "El Salvador", "Guatemala", "Honduras", "Mexico",
                                "Nicaragua", "Panama", "Paraguay", "Peru", "Uruguay"),
-                yr >= 2018) %>%
+                yr >= 2017) %>%
   dplyr:: mutate(country = if_else(country == "Bolivia (Plurinational State of)", "Bolivia",
                                    if_else(country == "Dominican Republic", "Dominica", country)))
 
@@ -186,18 +186,14 @@ rsv_regn <-
 #aggregate 
 rsv_regn <- 
   rsv_regn %>% 
-  dplyr::group_by(region, date, wk, mon, yr, yrwk, yrmo) %>%
+  dplyr::group_by(region, country, hemi, date, wk, mon, yr, yrwk, yrmo) %>%
   dplyr::summarise(cases = sum(cases))
 
-#check for duplicates by country and date
+#check for duplicates by region and date
 rsv_regn %>% 
   janitor::get_dupes(region, date)
 
 #rename the regions in full
 rsv_regn <- 
   rsv_regn %>% 
-  dplyr::distinct(region, date, .keep_all = TRUE) %>%
-  dplyr::mutate(region = if_else(region == "AFR", "AFRICA",
-                                 if_else(region == "AMR", "AMERICAS",
-                                         if_else(region == "EUR", "EUROPE",
-                                                 if_else(region == "SEAR", "SOUTH EAST ASIA", "WESTERN PACIFIC")))))
+  dplyr::distinct(region, date, .keep_all = TRUE)

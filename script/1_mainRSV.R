@@ -7,7 +7,7 @@
 #load packages for analysis
 pacman::p_load(char = c("lubridate", "tidyverse", "dplyr", "here", "rio", "scales", "boot", "magrittr",  "mvtnorm", "zoo", 
                         "patchwork", "PropCIs", "reshape2","purrr", "minqa", "ggridges", "timetk", "ggbreak", "ggpubr", "gridExtra", 
-                        "curl", "archive", "jsonlite", "janitor", "ggh4x", "tsibble", "here"))
+                        "curl", "archive", "jsonlite", "janitor", "ggh4x", "EpiEstim", "projections", "distcrete", "epitrix", "incidence2", "tsibble", "here"))
 
 #====================================================================
 
