@@ -24,7 +24,7 @@ output:
 
 ```{r LoadPackages, results = 'hide', message = FALSE, warning = FALSE}
 library(here)
-source(here("script", "1_mainRSV.R"))
+source(here("script", "01_mainRSV.R"))
                         
 ```
 
@@ -34,8 +34,8 @@ source(here("script", "1_mainRSV.R"))
 
 ```{r RunFileCache, results = "hide", message = FALSE, warning = FALSE}
 
-source(here("script", "2_fileCache.R"))
-source(here("script", "3_runIfExpired.R"))
+source(here("script", "02_fileCache.R"))
+source(here("script", "03_runIfExpired.R"))
 
 ```
 
@@ -45,7 +45,7 @@ source(here("script", "3_runIfExpired.R"))
 
 ```{r LoadRSVdata, results = "hide", message = FALSE, warning = FALSE}
 
-source(here("script", "4_loadRSVdata.R"))
+source(here("script", "04_loadRSVdata.R"))
 
 ```
 
@@ -55,7 +55,7 @@ source(here("script", "4_loadRSVdata.R"))
 
 ```{r PlotRSV1, message = FALSE, warning = FALSE, fig.width = 16, fig.height = 8, fig.align = 'center'}
 
-source(here("script", "5_seasRSV_region.R"))
+source(here("script", "05_seasRSV_region.R"))
 
 ```
 
@@ -65,7 +65,7 @@ source(here("script", "5_seasRSV_region.R"))
 
 ```{r PlotRSV2, message = FALSE, warning = FALSE, fig.width = 12, fig.height = 5, fig.align = 'center'}
 
-source(here("script", "6_seasRSV_hemi.R"))
+source(here("script", "06_seasRSV_hemi.R"))
 
 ```
 
@@ -75,7 +75,7 @@ source(here("script", "6_seasRSV_hemi.R"))
 
 ```{r PlotRSV3, message = FALSE, warning = FALSE, fig.width = 12, fig.height = 8, fig.align = 'center'}
 
-source(here("script", "7_seasRSV_afr.R"))
+source(here("script", "07_seasRSV_afr.R"))
 
 ```
 
@@ -85,7 +85,7 @@ source(here("script", "7_seasRSV_afr.R"))
 
 ```{r PlotRSV4, message = FALSE, warning = FALSE, fig.width = 16, fig.height = 6, fig.align = 'center'}
 
-source(here("script", "8_seasRSV_sear.R"))
+source(here("script", "08_seasRSV_sear.R"))
 
 ```
 
@@ -95,7 +95,7 @@ source(here("script", "8_seasRSV_sear.R"))
 
 ```{r PlotRSV5, message = FALSE, warning = FALSE, fig.width = 16, fig.height = 8, fig.align = 'center'}
 
-source(here("script", "9_seasRSV_wpr.R"))
+source(here("script", "09_seasRSV_wpr.R"))
 
 ```
 
