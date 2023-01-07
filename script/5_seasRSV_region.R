@@ -9,7 +9,7 @@
 print(
 rsv_regn %>%
   dplyr::group_by(region, date, wk) %>%
-  dplyr::summarise(cases = sum(cases, na.rm = TRUE)) %>%
+  dplyr::summarise(cases = mean(cases, na.rm = TRUE)) %>%
   dplyr::ungroup() %>%
   dplyr::group_by(region) %>%
   dplyr::mutate(cases = zoo::rollmean(cases, k = 3, fill = NA, align = 'right')) %>%
@@ -35,7 +35,7 @@ wkno = c(24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47
 rsv_regn_p <-
   rsv_regn %>%
   dplyr::group_by(region, yr, wk) %>%
-  dplyr::summarise(cases = sum(cases, na.rm = TRUE)) %>%
+  dplyr::summarise(cases = mean(cases, na.rm = TRUE)) %>%
   dplyr::ungroup() %>%
   dplyr::group_by(region, yr) %>% 
   dplyr::mutate(seas = if_else((region == "EUR" | region == "EMR") & wk %in% wkno2 & yr == 2017, "2017/18",
@@ -60,7 +60,7 @@ p1 <-
   facet_wrap(. ~ region, ncol = 1, scales = "free_y") +
   labs(title = "Weekly seasonal RSV cases", subtitle = "(Stratified by WHO region & year)", x = "Week", y = "RSV cases")  +
   guides(color = guide_legend(title = "")) +
-  scale_x_continuous(breaks = seq(1, 52, 4)) +
+  scale_x_continuous(breaks = seq(1, 53, 4)) +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
   theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow"))
@@ -73,7 +73,7 @@ p2 <-
   facet_wrap(. ~ region, ncol = 1, scales = "free_y") +
   labs(title = "", x = "Week", y = "")  +
   guides(color = guide_legend(title = "")) +
-  scale_x_continuous(breaks = seq(1, 52, 4)) +
+  scale_x_continuous(breaks = seq(1, 53, 4)) +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
   theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow"))
@@ -112,7 +112,7 @@ q1 <-
   dplyr::filter(region == "AFR" | region =="SEAR") %>% 
   ggplot(aes(x = wk, y = mcases, group = covid, color = covid)) +
   geom_line(size = 1) + 
-  scale_x_continuous(breaks = seq(1, 52, 4)) +
+  scale_x_continuous(breaks = seq(1, 53, 4)) +
   facet_wrap(. ~ region, ncol = 1, scales = "free_y") +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
@@ -126,7 +126,7 @@ q2 <-
   dplyr::filter(region == "AMR" | region =="WPR") %>% 
   ggplot(aes(x = wk, y = mcases, group = covid, color = covid)) +
   geom_line(size = 1) + 
-  scale_x_continuous(breaks = seq(1, 52, 4)) +
+  scale_x_continuous(breaks = seq(1, 53, 4)) +
   facet_wrap(. ~ region, ncol = 1, scales = "free_y") +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
@@ -136,7 +136,7 @@ q2 <-
 
 q3 <- 
   rsv_regn_q %>%
-  filter(region == "EUR" | region == "EMR") %>% 
+  dplyr::filter(region == "EUR" | region == "EMR") %>% 
   ggplot(aes(x = factor(wk, levels(factor(wk))[c(wkno)]), y = mcases, group = covid, color = covid)) +
   geom_line(size = 1) + 
   scale_x_discrete(breaks = seq(1, 52, 4)) +

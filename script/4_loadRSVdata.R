@@ -59,7 +59,7 @@ str(rsvds)
 #filter to have times series from 2018 on-wards
 rsv_asmw <- 
   rsvds %>%
-  dplyr::filter(country %in% c("Cameroon", "Central African Republic", "Côte d'Ivoire", "Madagascar", "South Africa", #African
+  dplyr::filter(country %in% c("Central African Republic", "Côte d'Ivoire", "Madagascar", "South Africa", #African
                                "India", #South East Asia
                                "Australia", "Japan", "Mongolia", "Malaysia", # Western pacific
                                "Oman", "Qatar"), #Eastern Mediterrenean
@@ -98,14 +98,14 @@ rsv_asmw <-
 rsv_euro <- 
   rsvds %>%
   dplyr::filter(country %in% c("France", "Germany", "Netherlands", "Spain", "Portugal", "Iceland",
-                               "Ireland", "Denmark", "Finland", "Sweden", "United Kingdom, England", 
+                               "Ireland", "Denmark", "Sweden", "United Kingdom, England", 
                                "United Kingdom, Northern Ireland", "United Kingdom, Scotland",
-                               "Bulgaria", "Russian Federation", "Hungary", "Poland", "Slovakia"),
+                               "Bulgaria", "Russian Federation", "Hungary", "Slovakia"),
                 yr >= 2017) %>%
-  dplyr::mutate(country = if_else(country == "United Kingdom, Northern Ireland", "NIreland",
+  dplyr::mutate(country = if_else(country == "United Kingdom, Northern Ireland", "Northern Ireland",
                                   if_else(country == "United Kingdom, Scotland", "Scotland",
                                           if_else(country == "United Kingdom, England", "England",
-                                                  if_else(country == "Russian Federation","Russia", country)))))
+                                                  if_else(country == "Russian Federation", "Russia", country)))))
 
 #'Not defined' may include sentinel or non-sentinel data
 #properly index by week to have 0 or some observed number of cases in sequential weeks
