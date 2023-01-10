@@ -47,14 +47,15 @@ rsv_euro <-
                                                                                                if_else((region == "EUR" | region == "EMR") & wk %in% wkno1 & yr == 2022, "2021/22",
                                                                                                        if_else((region == "EUR" | region == "EMR") & wk %in% wkno2 & yr == 2022, "2022/23",
                                                                                                                if_else((region == "EUR" | region == "EMR") & wk %in% wkno1 & yr == 2023, "2022/23", NA_character_))))))))))))
-  )
+  ) 
 
 #weekly seasonal RSV dynamics for each year
 print(
   rsv_euro %>%
     dplyr::filter(country %in% c("France", "Germany", "Netherlands", "Spain", "Portugal", "Iceland",
                                  "Ireland", "Denmark", "Sweden", "England", 
-                                 "Northern Ireland", "Scotland","Bulgaria", "Russia", "Hungary", "Slovakia")) %>% 
+                                 "Northern Ireland", "Scotland","Bulgaria", "Russia", "Hungary", "Slovakia"),
+                  !is.na(seas)) %>% 
     ggplot(aes(x = factor(wk, levels(factor(wk))[c(wkno)]), y = cases, group = seas, color = factor(seas))) +
     geom_line(size = 1) +
     facet_wrap(. ~ country, ncol = 4, scales = "free_y") +
@@ -76,7 +77,7 @@ print(
                                  "Ireland", "Denmark", "Sweden", "England", 
                                  "Northern Ireland", "Scotland","Bulgaria", "Russia", "Hungary", "Slovakia")) %>%
     mutate(covid = if_else(date < "2020-01-01", "Pre-C19 (2017-19)", if_else(date >= "2021-01-01" , "Post-C19 (2021-22)", NA_character_))) %>%
-    filter(!is.na(covid)) %>%
+    filter(!is.na(covid), !is.na(seas)) %>%
     group_by(country, wk, covid) %>%
     summarise(mcases = mean(cases, rm.na = TRUE)) %>%
     ungroup() %>%
