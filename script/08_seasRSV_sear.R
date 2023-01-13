@@ -7,15 +7,15 @@
 
 #weekly year on year RSV cases
 print(
-  rsv_asmw %>%
-    dplyr::filter(country %in% c("India")) %>% 
+  rsv_sear %>%
     dplyr::group_by(country) %>%
-    dplyr::mutate(cases = zoo::rollmean(cases, k = 3, fill = NA, align = 'right')) %>%
+    dplyr::mutate(cases = zoo::rollmean(cases, k = 3, fill = 0, align = 'right')) %>%
     dplyr::ungroup() %>%
     
-    ggplot(aes(x = zoo::as.yearmon(date, "%b %y"), y = cases)) +
+    ggplot(aes(x = date, y = cases)) +
     geom_line() + 
     facet_wrap(. ~ country, ncol = 2, scales = "free_y") +
+    scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
     theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
     theme(strip.background = element_rect(fill = "light yellow")) +
     theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
@@ -27,8 +27,7 @@ print(
 
 #weekly seasonal RSV dynamics for each year
 print(
-rsv_asmw %>%
-  dplyr::filter(country %in% c("India")) %>% 
+rsv_sear %>%
   ggplot(aes(x = wk, y = cases, group = yr, color = factor(yr))) +
   geom_line(size = 1) +
   facet_wrap(. ~ country, ncol = 2, scales = "free_y") +
@@ -45,8 +44,7 @@ rsv_asmw %>%
 
 #weekly seasonal RSV dynamics before and after COVID-19 by regions aggregated across all years
 print(
-rsv_asmw %>%
-  dplyr::filter(country %in% c("India")) %>%
+rsv_sear %>%
   mutate(covid = if_else(date < "2020-01-01", "Pre-C19 (2017-19)", if_else(date >= "2021-01-01" , "Post-C19 (2021-22)", NA_character_))) %>%
   filter(!is.na(covid)) %>%
   group_by(country, wk, covid) %>%
@@ -59,7 +57,7 @@ rsv_asmw %>%
   facet_wrap(. ~ country, ncol = 2, scales = "free_y") +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-  labs(title = "Weekly seasonal RSV cases", subtitle = "(Stratified by South East Asian country & Covid-19 phase)", x = "Week", y = "RSV cases") + 
+  labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by South East Asian country & Covid-19 phase)", x = "Week", y = "RSV cases") + 
   theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")) +
   guides(color = guide_legend(title = ""))
 )

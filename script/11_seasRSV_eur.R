@@ -8,16 +8,14 @@
 #weekly year on year RSV cases
 print(
   rsv_euro %>%
-    dplyr::filter(country %in% c("France", "Germany", "Netherlands", "Spain", "Portugal", "Iceland",
-                                 "Ireland", "Denmark", "Sweden", "England", 
-                                 "Northern Ireland", "Scotland","Bulgaria", "Russia", "Hungary", "Slovakia")) %>% 
     dplyr::group_by(country) %>%
-    dplyr::mutate(cases = zoo::rollmean(cases, k = 3, fill = NA, align = 'right')) %>%
+    dplyr::mutate(cases = zoo::rollmean(cases, k = 3, fill = 0, align = 'right')) %>%
     dplyr::ungroup() %>%
     
-    ggplot(aes(x = zoo::as.yearmon(date, "%b %y"), y = cases)) +
+    ggplot(aes(x = date, y = cases)) +
     geom_line() + 
     facet_wrap(. ~ country, ncol = 4, scales = "free_y") +
+    scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
     theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
     theme(strip.background = element_rect(fill = "light yellow")) +
     theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
@@ -52,10 +50,7 @@ rsv_euro <-
 #weekly seasonal RSV dynamics for each year
 print(
   rsv_euro %>%
-    dplyr::filter(country %in% c("France", "Germany", "Netherlands", "Spain", "Portugal", "Iceland",
-                                 "Ireland", "Denmark", "Sweden", "England", 
-                                 "Northern Ireland", "Scotland","Bulgaria", "Russia", "Hungary", "Slovakia"),
-                  !is.na(seas)) %>% 
+    dplyr::filter(!is.na(seas)) %>%
     ggplot(aes(x = factor(wk, levels(factor(wk))[c(wkno)]), y = cases, group = seas, color = factor(seas))) +
     geom_line(size = 1) +
     facet_wrap(. ~ country, ncol = 4, scales = "free_y") +
@@ -73,9 +68,6 @@ print(
 #weekly seasonal RSV dynamics before and after COVID-19 by regions aggregated across all years
 print(
   rsv_euro %>%
-    dplyr::filter(country %in% c("France", "Germany", "Netherlands", "Spain", "Portugal", "Iceland",
-                                 "Ireland", "Denmark", "Sweden", "England", 
-                                 "Northern Ireland", "Scotland","Bulgaria", "Russia", "Hungary", "Slovakia")) %>%
     mutate(covid = if_else(date < "2020-01-01", "Pre-C19 (2017-19)", if_else(date >= "2021-01-01" , "Post-C19 (2021-22)", NA_character_))) %>%
     filter(!is.na(covid), !is.na(seas)) %>%
     group_by(country, wk, covid) %>%
@@ -88,7 +80,7 @@ print(
     facet_wrap(. ~ country, ncol = 4, scales = "free_y") +
     theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
     theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-    labs(title = "Weekly seasonal RSV cases", subtitle = "(Stratified by European country & Covid-19 phase)", x = "Week", y = "RSV cases") + 
+    labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by European country & Covid-19 phase)", x = "Week", y = "RSV cases") + 
     theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")) +
     guides(color = guide_legend(title = ""))
 )

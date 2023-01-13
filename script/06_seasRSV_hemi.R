@@ -7,17 +7,18 @@
 
 #weekly year on year RSV cases
 print(
-  rsv_regn %>%
+  rsv_all %>%
     dplyr::group_by(hemi, date, wk) %>%
     dplyr::summarise(cases = mean(cases, na.rm = TRUE)) %>%
     dplyr::ungroup() %>%
     dplyr::group_by(hemi) %>%
-    dplyr::mutate(cases = zoo::rollmean(cases, k = 3, fill = NA, align = 'right')) %>%
+    dplyr::mutate(cases = zoo::rollmean(cases, k = 3, fill = 0, align = 'right')) %>%
     dplyr::ungroup() %>%
     
-    ggplot(aes(x = zoo::as.yearmon(date, "%b %y"), y = cases)) +
+    ggplot(aes(x = date, y = cases)) +
     geom_line() + 
     facet_wrap(. ~ hemi, scales = "free_y") +
+    scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
     theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
     theme(strip.background = element_rect(fill = "light yellow")) +
     theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
@@ -32,8 +33,8 @@ wkno1 = c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
 wkno2 = c(24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53)
 wkno = c(24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
 
-rsv_regn_h <-
-  rsv_regn %>%
+rsv_all_h <-
+  rsv_all %>%
   dplyr::group_by(hemi, yr, wk) %>%
   dplyr::summarise(cases = mean(cases, na.rm = TRUE)) %>%
   dplyr::ungroup() %>%
@@ -53,12 +54,12 @@ rsv_regn_h <-
   )
 
 r1 <-
-  rsv_regn_h %>%
+  rsv_all_h %>%
   dplyr::filter(hemi == "SH") %>% 
   ggplot(aes(x = wk, y = cases, group = yr, color = factor(yr))) +
   geom_line(size = 1) +
   facet_wrap(. ~ hemi, ncol = 1, scales = "free_y") +
-  labs(title = "Weekly seasonal mean RSV cases", subtitle = "(Stratified by hemisphere & year)", x = "Week", y = "RSV cases")  +
+  labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by hemisphere & year)", x = "Week", y = "RSV cases")  +
   guides(color = guide_legend(title = "")) +
   scale_x_continuous(breaks = seq(1, 53, 4)) +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
@@ -66,7 +67,7 @@ r1 <-
   theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow"))
 
 r2 <-
-  rsv_regn_h %>%
+  rsv_all_h %>%
   dplyr::filter(!is.na(seas)) %>%
   filter(hemi == "NH") %>% 
   ggplot(aes(x = factor(wk, levels(factor(wk))[c(wkno)]), y = cases, group = seas, color = factor(seas))) +
@@ -86,8 +87,8 @@ print(r1 + r2)
 #====================================================================
 
 #weekly seasonal RSV dynamics before/after COVID-19 by regions aggregated across years
-rsv_regn_i <-
-  rsv_regn %>%
+rsv_all_i <-
+  rsv_all %>%
   dplyr::mutate(covid = if_else(date < "2020-01-01", "Pre-C19 (2017-19)", "Post-C19 (2021-22)")) %>%
   dplyr::filter(!is.na(covid)) %>%
   dplyr::group_by(hemi, wk, covid) %>%
@@ -95,7 +96,7 @@ rsv_regn_i <-
   dplyr::ungroup()
 
 s1 <- 
-  rsv_regn_i %>%
+  rsv_all_i %>%
   dplyr::filter(hemi == "SH") %>% 
   ggplot(aes(x = wk, y = mcases, group = covid, color = covid)) +
   geom_line(size = 1) + 
@@ -103,12 +104,12 @@ s1 <-
   facet_wrap(. ~ hemi, ncol = 1, scales = "free_y") +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-  labs(title = "Weekly seasonal mean RSV cases", subtitle = "(Stratified by hemisphere & COVID-19 phase)", x = "Week", y = "RSV cases") + 
+  labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by hemisphere & COVID-19 phase)", x = "Week", y = "RSV cases") + 
   theme(legend.position = "none", strip.background = element_rect(fill = "light yellow")) +
   guides(color = guide_legend(title = ""))
 
 s2 <- 
-  rsv_regn_i %>%
+  rsv_all_i %>%
   dplyr::filter(hemi == "NH") %>% 
   ggplot(aes(x = factor(wk, levels(factor(wk))[c(wkno)]), y = mcases, group = covid, color = covid)) +
   geom_line(size = 1) + 
@@ -118,7 +119,7 @@ s2 <-
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
   labs(title = "", x = "Week", y = "") + 
   theme(legend.position = "right", strip.background = element_rect(fill = "light yellow")) +
-  guides(color = guide_legend(title = "Mean weekly cases"))
+  guides(color = guide_legend(title = ""))
 
 print(s1 + s2)
 
