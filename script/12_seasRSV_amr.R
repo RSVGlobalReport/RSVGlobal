@@ -19,7 +19,7 @@ print(
     theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
     theme(strip.background = element_rect(fill = "light yellow")) +
     theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-    labs(title = "14-days rolling average RSV cases, 2017-2022", subtitle = "(Stratified by Western Pacific country)", x = "Date", y = "RSV cases")
+    labs(title = "14-days rolling average RSV cases, 2017-2022", subtitle = "(Stratified by Americas country)", x = "Date", y = "RSV cases")
 )
 
 #====================================================================
@@ -31,7 +31,7 @@ print(
     ggplot(aes(x = wk, y = cases, group = yr, color = factor(yr))) +
     geom_line(size = 1) +
     facet_wrap(. ~ country, ncol = 3, scales = "free_y") +
-    labs(title = "Weekly seasonal RSV cases", subtitle = "(Stratified by Western Pacific country & year)", x = "Week", y = "RSV cases")  +
+    labs(title = "Weekly seasonal RSV cases", subtitle = "(Stratified by Americas country & year)", x = "Week", y = "RSV cases")  +
     guides(color = guide_legend(title = "")) +
     scale_x_continuous(breaks = seq(1, 53, 4)) +
     theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
@@ -54,10 +54,10 @@ print(
     ggplot(aes(x = wk, y = mcases, group = covid, color = covid)) +
     geom_line(size = 1) + 
     scale_x_continuous(breaks = seq(1, 53, 4)) +
-    facet_wrap(. ~ country, ncol = 2, scales = "free_y") +
+    facet_wrap(. ~ country, ncol = 3, scales = "free_y") +
     theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
     theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-    labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by Western Pacific country & Covid-19 phase)", x = "Week", y = "RSV cases") + 
+    labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by Americas country & Covid-19 phase)", x = "Week", y = "RSV cases") + 
     theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")) +
     guides(color = guide_legend(title = ""))
 )
