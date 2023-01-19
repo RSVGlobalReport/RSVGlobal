@@ -6,7 +6,6 @@
 
 #read the WHO RSV update file into R
 rsv <- runIfExpired('who_rsv', maxage = 168, ~read.csv(curl("https://frontdoor-l4uikgap6gz3m.azurefd.net/FLUMART/VIW_FNT?$format=csv")))
-#usa <- runIfExpired('usa_rsv', maxage = 168, ~read.csv(curl("https://data.cdc.gov/api/odata/v4/52kb-ccu2")))
 
 #set strings as factors to false globally
 options(stringsAsFactors = FALSE)
@@ -23,8 +22,6 @@ rsvds <-
                 "date"= MMWR_WEEKSTARTDATE,
                 "sentin" = ORIGIN_SOURCE,
                 "cases" = RSV)
-
-#readr::write_csv(x = rsvds, file = here("data", "RSVglobal.csv"))
 
 #view structure of data
 str(rsvds)
