@@ -41,11 +41,21 @@ source(here("script", "03_runIfExpired.R"))
 
 &nbsp;
 
-### Load RSV datasets
+### Load RSV datasets for OTher countries 
 
-```{r LoadRSVdata, results = "hide", message = FALSE, warning = FALSE}
+```{r LoadRSVdataOT, results = "hide", message = FALSE, warning = FALSE}
 
-source(here("script", "04_loadRSVdata.R"))
+source(here("script", "04_loadRSVdata_OT.R"))
+
+```
+
+&nbsp;
+
+### Load RSV datasets for the US
+
+```{r LoadRSVdataUS, results = "hide", message = FALSE, warning = FALSE}
+
+source(here("script", "04_loadRSVdata_US.R"))
 
 ```
 
@@ -129,3 +139,10 @@ source(here("script", "12_seasRSV_amr.R"))
 
 ```
 
+### Dynamics of RSV in the United States of America
+
+```{r PlotRSV9, message = FALSE, warning = FALSE, fig.width = 16, fig.height = 8, fig.align = 'center'}
+
+source(here("script", "13_seasRSV_usa.R"))
+
+```
