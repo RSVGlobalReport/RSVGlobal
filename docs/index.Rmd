@@ -139,6 +139,8 @@ source(here("script", "12_seasRSV_amr.R"))
 
 ```
 
+&nbsp;
+
 ### Dynamics of RSV in the United States of America
 
 ```{r PlotRSV9, message = FALSE, warning = FALSE, fig.width = 16, fig.height = 8, fig.align = 'center'}

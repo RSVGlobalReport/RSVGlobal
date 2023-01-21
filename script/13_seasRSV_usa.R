@@ -13,7 +13,7 @@ print(
     dplyr::ungroup() %>%
     
     ggplot(aes(x = date, y = cases)) +
-    geom_line() + 
+    geom_line(size = 0.8) + 
     facet_wrap(. ~ country, ncol = 4, scales = "free_y") +
     scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
     theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
@@ -66,25 +66,26 @@ rsv_usa_reg <-
 
 #weekly seasonal RSV dynamics for each year
 print(
-  rbind(rsv_usa_nat, rsv_usa_reg) %>%
-  dplyr::mutate(regionUS = factor(regionUS, levels = c("National", "North East", "Mid West", "West", "Florida", "South"))) %>%
-  ggplot(aes(x = factor(wk, levels(factor(wk))[c(wkno)]), y = cases, group = seas, color = factor(seas))) +
-  geom_line(size = 1) +
-  facet_wrap(. ~ regionUS, ncol = 3, scales = "free_y") +
-  labs(title = "Weekly seasonal RSV cases", subtitle = "(Stratified by US region & year)", x = "Week", y = "RSV cases")  +
-  guides(color = guide_legend(title = "")) +
-  scale_x_discrete(breaks = seq(1, 52, 4)) +
-  theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
-  theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-  theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow"))
-)
+  dplyr::rows_append(rsv_usa_nat, rsv_usa_reg) %>%
+    dplyr::filter(!is.na(seas)) %>%
+    dplyr::mutate(regionUS = factor(regionUS, levels = c("National", "North East", "Mid West", "West", "South"))) %>%
+    ggplot(aes(x = factor(wk, levels(factor(wk))[c(wkno)]), y = cases, group = seas, color = factor(seas))) +
+    geom_line(size = 1) +
+    facet_wrap(. ~ regionUS, ncol = 3, scales = "free_y") +
+    labs(title = "Weekly seasonal RSV cases", subtitle = "(Stratified by US census region & year)", x = "Week", y = "RSV cases")  +
+    guides(color = guide_legend(title = "")) +
+    scale_x_discrete(breaks = seq(1, 52, 4)) +
+    theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
+    theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
+    theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow"))
+  )
 
 #====================================================================
 #====================================================================
 
 #weekly seasonal RSV dynamics before and after COVID-19 by regions aggregated across all years
 print(
-  rbind(rsv_usa_nat, rsv_usa_reg) %>%
+  dplyr::rows_append(rsv_usa_nat, rsv_usa_reg) %>%
     mutate(regionUS = factor(regionUS, levels = c("National", "North East", "Mid West", "West", "South", "Florida"))) %>%
 
     mutate(covid = if_else(date < "2020-01-01", "Pre-C19 (2017-19)", if_else(date >= "2021-01-01" , "Post-C19 (2021-22)", NA_character_))) %>%
@@ -99,7 +100,7 @@ print(
     facet_wrap(. ~ regionUS, ncol = 3, scales = "free_y") +
     theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
     theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-    labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by US region & Covid-19 phase)", x = "Week", y = "RSV cases") + 
+    labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by US census region & Covid-19 phase)", x = "Week", y = "RSV cases") + 
     theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")) +
     guides(color = guide_legend(title = ""))
 )

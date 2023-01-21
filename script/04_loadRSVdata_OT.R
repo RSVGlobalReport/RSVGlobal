@@ -5,6 +5,7 @@
 #====================================================================
 
 #read the WHO RSV update file into R
+#source (https://www.who.int/teams/global-influenza-programme/surveillance-and-monitoring/influenza-surveillance-outputs)
 rsv <- runIfExpired('who_rsv', maxage = 168, ~read.csv(curl("https://frontdoor-l4uikgap6gz3m.azurefd.net/FLUMART/VIW_FNT?$format=csv")))
 
 #set strings as factors to false globally
