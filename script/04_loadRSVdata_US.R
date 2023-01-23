@@ -18,7 +18,7 @@ rsv_usaFl <- runIfExpired('usa_rsv/rsv2021Fl+', maxage = 168, ~XML::readHTMLTabl
 
 #data wrangling
 rsv_usa_reg1 <-
-  rbind(
+  base::rbind(
     rsv_usaNE %>% 
       dplyr::select(RepWeekDate, `PCR Detections`) %>% #we are reading Antigen test results only but its incorrectly labeled as PCR from source data
       dplyr::rename("date" = "RepWeekDate", cases = `PCR Detections`) %>%
@@ -52,19 +52,19 @@ rsv_usa_reg1 <-
                 country = "United States") %>%
   dplyr::select(hemi, region, country, regionUS, date, cases)
 
-rm(rsv_usaNE, rsv_usaMW, rsv_usaSo, rsv_usaWe, rsv_usaFl)
+base::rm(rsv_usaNE, rsv_usaMW, rsv_usaSo, rsv_usaWe, rsv_usaFl)
 
 #view structure of data
-str(rsv_usa_reg1)
+utils::str(rsv_usa_reg1)
 
 #expand the dataset to have single case per row
 rsv_usa_reg1 <- 
   rsv_usa_reg1 %>% 
-  type.convert(as.is = TRUE) %>% 
-  uncount(cases)
+  utils::type.convert(as.is = TRUE) %>% 
+  tidyr::uncount(cases)
 
 #view structure of data
-str(rsv_usa_reg1)
+utils::str(rsv_usa_reg1)
 
 #assign data types to variables
 rsv_usa_reg1 <-
@@ -76,7 +76,7 @@ rsv_usa_reg1 <-
                 date = lubridate::ymd(date))
 
 # view structure of data
-str(rsv_usa_reg1)
+utils::str(rsv_usa_reg1)
 
 #====================================================================
 #====================================================================
@@ -102,16 +102,16 @@ rsv_usa_reg2 <-
   dplyr::select(hemi, region, country, regionUS, date, cases)
   
 #view structure of data
-str(rsv_usa_reg2)
+utils::str(rsv_usa_reg2)
 
 #expand the dataset to have single case per row
 rsv_usa_reg2 <- 
   rsv_usa_reg2 %>% 
-  type.convert(as.is = TRUE) %>% 
-  uncount(cases)
+  utils::type.convert(as.is = TRUE) %>% 
+  tidyr:: uncount(cases)
 
 #view structure of data
-str(rsv_usa_reg2)
+utils::str(rsv_usa_reg2)
 
 #assign data types to variables
 rsv_usa_reg2 <-
@@ -123,17 +123,17 @@ rsv_usa_reg2 <-
                 date = lubridate::ymd(date))
 
 # view structure of data
-str(rsv_usa_reg2)
+utils::str(rsv_usa_reg2)
 
 #====================================================================
 #====================================================================
 
 #combine dataset from 2020 backwards (rsv_usa2) and 2021 onwards (rsv_usa1)
 rsv_usa_reg <-
-  rows_append(
+  dplyr::rows_append(
     rsv_usa_reg1,
     rsv_usa_reg2)
-rm(rsv_usa_reg1, rsv_usa_reg2)
+base::rm(rsv_usa_reg1, rsv_usa_reg2)
 
 #properly index by week to have 0 or some observed number of cases in sequential weeks
 rsv_usa_reg <- 
@@ -159,7 +159,7 @@ rsv_usa_reg <-
   rsv_usa_reg %>% 
   dplyr::filter(yr >= 2017) %>%
   dplyr::distinct(regionUS, date, .keep_all = TRUE) %>%
-  select(hemi, region, country, date, cases, yr, mo, wk, regionUS)
+  dplyr::select(hemi, region, country, date, cases, yr, mo, wk, regionUS)
 
 
 #====================================================================
