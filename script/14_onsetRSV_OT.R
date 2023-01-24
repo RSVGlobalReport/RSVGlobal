@@ -13,7 +13,8 @@
 
 #split the dataset by country each having country name, yr, wk (up to 52 weeks) and cases from 2017-2019
 #we restrict weeks to 52 (may also take mean cases of week 52 and 53 and assign to week 52)
-X <- rbind(rsv_afr, rsv_wpr, rsv_sear, rsv_emr, rsv_amer, rsv_euro) %>%
+#, rsv_usa_nat %>% select(hemi:date, yr, mo, wk, cases)
+X <- rsv_all %>%
   select(country, yr, wk, cases) %>%
   group_by(country, yr) %>%
   mutate(tcases = sum(cases, na.rm = TRUE)) %>%
@@ -22,7 +23,7 @@ X <- rbind(rsv_afr, rsv_wpr, rsv_sear, rsv_emr, rsv_amer, rsv_euro) %>%
   arrange(country, yr, wk, cases) %>%
   split(list(.$country, .$yr))
 
-#delete empty country.yr dataframes from list X (they have <10 total cases [tcases] throughout the year)
+#delete empty country.yr dataframes from list X (they have less than threshold total cases [tcases] throughout the year)
 X <- X[unlist(lapply(X, nrow) != 0)]
 
 #function to calculate derivative and assist derivative calculation
@@ -60,7 +61,7 @@ for (i in 1:length(X)){
   cases.samples[[i]] = pspline.sample.timeseries(Gmodels[[i]], 
                                                  data.frame(wk = t), 
                                                  pspline.outbreak.cases, 
-                                                 samples = 100)
+                                                 samples = 30)
   }
 
 #iterate for each country, compute first and second derivative
@@ -103,7 +104,7 @@ rsv_onset <- as.data.frame(rsv_onset)
 rsv_onset <- 
   rsv_onset %>%
   left_join(
-    rbind(rsv_afr, rsv_wpr, rsv_sear, rsv_emr, rsv_amer, rsv_euro) %>%
+    rsv_all %>%
       select(country, yr, wk, cases) %>%
       group_by(country, yr) %>%
       mutate(tcases = sum(cases, na.rm = TRUE)) %>%
@@ -118,14 +119,21 @@ rsv_onset <-
 #====================================================================
 
 #combine datasets for plotting
-rsv_onset %>%
+print(rsv_onset %>%
+  mutate(epiper = if_else(yr == 2017 | yr == 2018 | yr == 2019, " Mean onset (2017-19)", 
+                          if_else(yr == 2021, "2021 (2021/22)", "2022 (2022/23)"))) %>%
+  group_by(country, epiper) %>%
+  summarise(epiavg = mean(epiwk, na.rm = TRUE),
+            l_epiavg = mean(l_epiwk, na.rm = TRUE),
+            u_epiavg = mean(u_epiwk, na.rm = TRUE)) %>%
   
-  ggplot(aes(x = epiwk, y = country, color = country)) +
-  geom_point(size = 2) + 
-  geom_errorbar(aes(xmin = l_epiwk, xmax = u_epiwk), width = 0, size = 0.3) +
+  ggplot(aes(x = epiavg, y = country, color = country)) +
+  geom_point(size = 4) + 
+  geom_errorbar(aes(xmin = l_epiavg, xmax = u_epiavg), width = 0, size = 0.8) +
   theme_bw() +
-  facet_wrap(.~yr, ncol = 5) +
+  scale_x_continuous(breaks = seq(1, 52, 4)) +
+  facet_wrap(.~epiper, ncol = 3) +
   labs(x = "Epidemiological week", y = "country") +
   theme(legend.position = "none", strip.background = element_rect(fill = "white"))
- 
+)
   

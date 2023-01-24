@@ -148,3 +148,13 @@ source(here("script", "12_seasRSV_amr.R"))
 source(here("script", "13_seasRSV_usa.R"))
 
 ```
+
+&nbsp;
+
+### Onset of RSV outbreaks in different countries globally
+
+```{r PlotRSV10, message = FALSE, warning = FALSE, fig.width = 16, fig.height = 12, fig.align = 'center'}
+
+source(here("script", "14_onsetRSV_OT.R"))
+
+```
