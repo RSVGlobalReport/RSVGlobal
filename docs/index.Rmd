@@ -61,6 +61,26 @@ source(here("script", "04_loadRSVdata_US.R"))
 
 &nbsp;
 
+### Load RSV onset datasets for OTher countries
+
+```{r LoadRSVonsetOT, results = "hide", message = FALSE, warning = FALSE}
+
+source(here("script", "04_loadRSVOnset_OT.R"))
+
+```
+
+&nbsp;
+
+### Load RSV onset datasets for the US
+
+```{r LoadRSVonsetUS, results = "hide", message = FALSE, warning = FALSE}
+
+source(here("script", "04_loadRSVOnset_US.R"))
+
+```
+
+&nbsp;
+
 ### Seasonal dynamics of RSV by WHO region
 
 ```{r PlotRSV1, message = FALSE, warning = FALSE, fig.width = 16, fig.height = 8, fig.align = 'center'}
@@ -151,10 +171,32 @@ source(here("script", "13_seasRSV_usa.R"))
 
 &nbsp;
 
-### Onset of RSV outbreaks in different countries globally
+### Onset of RSV outbreaks by region
 
 ```{r PlotRSV10, message = FALSE, warning = FALSE, fig.width = 16, fig.height = 12, fig.align = 'center'}
 
-source(here("script", "14_onsetRSV_OT.R"))
+source(here("script", "14_onsetRSV_region1.R"))
+source(here("script", "14_onsetRSV_region2.R"))
+source(here("script", "14_onsetRSV_region3.R"))
+
+```
+
+&nbsp;
+
+### Onset of RSV outbreaks by northen hemisphere
+
+```{r PlotRSV11, message = FALSE, warning = FALSE, fig.width = 16, fig.height = 12, fig.align = 'center'}
+
+source(here("script", "15_onsetRSV_nhemi.R"))
+
+```
+
+&nbsp;
+
+### Onset of RSV outbreaks by southern hemisphere
+
+```{r PlotRSV12, message = FALSE, warning = FALSE, fig.width = 16, fig.height = 12, fig.align = 'center'}
+
+source(here("script", "15_onsetRSV_shemi.R"))
 
 ```
