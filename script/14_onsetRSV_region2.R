@@ -20,7 +20,7 @@ q1 <-
   geom_errorbar(aes(xmin = l_epiavg, xmax = u_epiavg), width = 0, size = 0.8, position = position_dodge(width = 0.2)) +
   scale_x_continuous(breaks = seq(1, 52, 4)) + 
   theme_bw() +
-  labs(x = "Epidemiological week", y = "", title = "SOUTH EAST ASIA") +
+  labs(x = "Epi week", y = "", title = "SOUTH EAST ASIA") +
   theme(legend.position = "none")
 
 #====================================================================
@@ -41,7 +41,7 @@ q2 <-
   geom_errorbar(aes(xmin = l_epiavg, xmax = u_epiavg), width = 0, size = 0.8, position = position_dodge(width = 0.5)) +
   scale_x_continuous(breaks = seq(1, 52, 4)) + 
   theme_bw() +
-  labs(x = "Epidemiological week", y = "", title = "EUROPE") +
+  labs(x = "Epi week", y = "", title = "EUROPE") +
   theme(legend.position = "bottom", legend.title = element_blank()) 
 
 #====================================================================
@@ -62,7 +62,7 @@ q3 <-
   geom_errorbar(aes(xmin = l_epiavg, xmax = u_epiavg), width = 0, size = 0.8, position = position_dodge(width = 0.2)) +
   scale_x_continuous(breaks = seq(1, 52, 4)) + 
   theme_bw() +
-  labs(x = "Epidemiological week", y = "", title = "WESTERN PACIFIC") +
+  labs(x = "Epi week", y = "", title = "WESTERN PACIFIC") +
   theme(legend.position = "none") 
 
 #====================================================================

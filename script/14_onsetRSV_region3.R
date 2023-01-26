@@ -19,6 +19,6 @@ print(
   geom_errorbar(aes(xmin = l_epiavg, xmax = u_epiavg), width = 0, size = 0.8, position = position_dodge(width = 0.2)) +
   scale_x_continuous(breaks = seq(1, 53, 4)) + 
   theme_bw() +
-  labs(x = "Epidemiological week", y = "", title = "UNITED STATES OF AMERICA") +
+  labs(x = "Epi week", y = "", title = "UNITED STATES OF AMERICA") +
   theme(legend.position = "right", legend.title = element_blank())
 )

@@ -33,7 +33,7 @@ print(
   ggplot(aes(x = wk, y = cases, group = yr, color = factor(yr))) +
   geom_line(size = 1) +
   facet_wrap(. ~ country, ncol = 2, scales = "free_y") +
-  labs(title = "Weekly seasonal RSV cases", subtitle = "(Stratified by Western Pacific country & year)", x = "Week", y = "RSV cases")  +
+  labs(title = "Weekly seasonal RSV cases", subtitle = "(Stratified by Western Pacific country & year)", x = "Epi week", y = "RSV cases")  +
   guides(color = guide_legend(title = "")) +
   scale_x_continuous(breaks = seq(1, 53, 4)) +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
@@ -48,7 +48,7 @@ print(
 print(
   rsv_wpr %>%
   dplyr::filter(country %in% c("Australia", "Japan", "Mongolia", "Malaysia")) %>%
-  mutate(covid = if_else(date < "2020-01-01", "Pre-C19 (2017-19)", if_else(date >= "2021-01-01" , "Post-C19 (2021-22)", NA_character_))) %>%
+  dplyr::mutate(covid = if_else(date < "2020-01-01", " Pre-C19 (2017-19)", if_else(year(date) == 2021, "2021", "2022"))) %>%
   filter(!is.na(covid)) %>%
   group_by(country, wk, covid) %>%
   summarise(mcases = mean(cases, rm.na = TRUE)) %>%
@@ -60,7 +60,7 @@ print(
   facet_wrap(. ~ country, ncol = 2, scales = "free_y") +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-  labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by Western Pacific country & Covid-19 phase)", x = "Week", y = "RSV cases") + 
+  labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by Western Pacific country & Covid-19 phase)", x = "Epi week", y = "RSV cases") + 
   theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")) +
   guides(color = guide_legend(title = ""))
 )

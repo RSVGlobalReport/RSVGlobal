@@ -59,7 +59,7 @@ r1 <-
   ggplot(aes(x = wk, y = cases, group = yr, color = factor(yr))) +
   geom_line(size = 1) +
   facet_wrap(. ~ hemi, ncol = 1, scales = "free_y") +
-  labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by hemisphere & year)", x = "Week", y = "RSV cases")  +
+  labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by hemisphere & year)", x = "Epi week", y = "RSV cases")  +
   guides(color = guide_legend(title = "")) +
   scale_x_continuous(breaks = seq(1, 53, 4)) +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
@@ -73,7 +73,7 @@ r2 <-
   ggplot(aes(x = factor(wk, levels(factor(wk))[c(wkno)]), y = cases, group = seas, color = factor(seas))) +
   geom_line(size = 1) +
   facet_wrap(. ~ hemi, ncol = 1, scales = "free_y") +
-  labs(title = "", x = "Week", y = "")  +
+  labs(title = "", x = "Epi week", y = "")  +
   guides(color = guide_legend(title = "")) +
   scale_x_discrete(breaks = seq(1, 52, 4)) +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
@@ -89,7 +89,7 @@ print(r1 + r2)
 #weekly seasonal RSV dynamics before/after COVID-19 by regions aggregated across years
 rsv_all_i <-
   rsv_all %>%
-  dplyr::mutate(covid = if_else(date < "2020-01-01", "Pre-C19 (2017-19)", "Post-C19 (2021-22)")) %>%
+  dplyr::mutate(covid = if_else(date < "2020-01-01", " Pre-C19 (2017-19)", if_else(year(date) == 2021, "2021", "2022"))) %>%
   dplyr::filter(!is.na(covid)) %>%
   dplyr::group_by(hemi, wk, covid) %>%
   dplyr::summarise(mcases = mean(cases, rm.na = TRUE)) %>%
@@ -104,7 +104,7 @@ s1 <-
   facet_wrap(. ~ hemi, ncol = 1, scales = "free_y") +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-  labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by hemisphere & COVID-19 phase)", x = "Week", y = "RSV cases") + 
+  labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by hemisphere & COVID-19 phase)", x = "Epi week", y = "RSV cases") + 
   theme(legend.position = "none", strip.background = element_rect(fill = "light yellow")) +
   guides(color = guide_legend(title = ""))
 
@@ -117,7 +117,7 @@ s2 <-
   facet_wrap(. ~ hemi, ncol = 1, scales = "free_y") +
   theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
   theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-  labs(title = "", x = "Week", y = "") + 
+  labs(title = "", x = "Epi week", y = "") + 
   theme(legend.position = "right", strip.background = element_rect(fill = "light yellow")) +
   guides(color = guide_legend(title = ""))
 
