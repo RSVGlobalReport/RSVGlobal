@@ -455,4 +455,10 @@ rsv_all <-
   dplyr::bind_rows(rsv_wpr) %>%
   dplyr::bind_rows(rsv_emr) %>%
   dplyr::bind_rows(rsv_euro) %>%
-  dplyr::bind_rows(rsv_amer)
+  dplyr::bind_rows(rsv_amer) %>%
+  mutate(region = if_else(region == "AFR", "Africa",
+                          if_else(region == "AMR", "Americas",
+                                  if_else(region == "EMR", "Eastern Mediterranean",
+                                          if_else(region == "EUR", "Europe",
+                                                  if_else(region == "SEAR", "South East Asia", "Western Pacific"))))),
+         hemi = if_else(hemi == "SH", "Southern hemisphere", "Northern hemisphere"))
