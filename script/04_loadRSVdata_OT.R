@@ -316,12 +316,11 @@ rsv_euro <-
   dplyr::filter(country %in% c("France", "Germany", "Netherlands", "Spain", "Portugal", "Iceland",
                                "Ireland", "Denmark", "Sweden", "United Kingdom, England", 
                                "United Kingdom, Northern Ireland", "United Kingdom, Scotland",
-                               "Bulgaria", "Russian Federation", "Hungary", "Slovakia"), 
+                               "Bulgaria", "Hungary", "Slovakia"), 
                 year(date) >= 2017) %>%
   dplyr::mutate(country = if_else(country == "United Kingdom, Northern Ireland", "Northern Ireland",
                                   if_else(country == "United Kingdom, Scotland", "Scotland",
-                                          if_else(country == "United Kingdom, England", "England",
-                                                  if_else(country == "Russian Federation", "Russia", country)))))
+                                          if_else(country == "United Kingdom, England", "England", country))))
 
 #'Not defined' may include sentinel or non-sentinel data
 #'properly index by week to have 0 or some observed number of cases in sequential weeks

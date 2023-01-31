@@ -3,86 +3,148 @@
 #global reemergence of RSV onset, duration and peak
 
 #====================================================================
+#YEAR ON YEAR RSV DYNAMICS IN EASTERN MEDITERRENEAN
 #====================================================================
 
 #weekly year on year RSV cases
-print(
+plot25 = plotly::ggplotly(
   rsv_emr %>%
-    dplyr::filter(country %in% c("Oman", "Qatar")) %>% 
     dplyr::group_by(country) %>%
-    dplyr::mutate(cases = zoo::rollmean(cases, k = 3, fill = 0, align = 'right')) %>%
+    dplyr::mutate(cases = round(zoo::rollmean(cases, k = 3, fill = 0, align = 'right'), digits = 0),
+                  newDate = max(date, na.rm = TRUE),
+                  newCases = cases[which.max(date == newDate)]) %>%
     dplyr::ungroup() %>%
     
     ggplot(aes(x = date, y = cases)) +
     geom_line() + 
-    facet_wrap(. ~ country, ncol = 4, scales = "free_y") +
+    geom_point(aes(x = newDate, y = newCases), color = "red", size = 1.5) +
+    facet_wrap(. ~ country, ncol = 2, scales = "free_y") +
     scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
-    theme_bw(base_size = 10, base_family = "Lato", base_line_size = 1) +
-    theme(strip.background = element_rect(fill = "light yellow")) +
+    theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
+    theme(strip.background = element_rect(fill = "white")) +
     theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-    labs(title = "14-days rolling average RSV cases, 2017-2022", subtitle = "(Stratified by Eastern Mediterranean country)", x = "Date", y = "RSV cases")
-)
+    labs(title = "14-days Rolling Average RSV cases in Eastern Mediterrenean, from 2017+ years", x = "Date", y = "RSV cases"))
+
+htmlwidgets::saveWidget(as_widget(plot25), here("output", "yearOnyear_all_eastern_mediterrenean", file = "all_eastern_mediterrenean_yearOnyear.html"))
+
 
 #====================================================================
+#WEEKLY RSV DYNAMICS BY COUNTRY
 #====================================================================
 
 #weekly seasonal RSV dynamics for each year
-wkno1 = c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
-wkno2 = c(24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53)
-wkno = c(24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23)
+wkno1 = 1:23
+wkno2 = 24:53
+wkno = c(24:53, 1:23)
 
-rsv_emr <-
+rsv_all_p <-
   rsv_emr %>%
-  dplyr::group_by(country, yr) %>% 
-  dplyr::mutate(seas = if_else((region == "EUR" | region == "EMR") & wk %in% wkno2 & yr == 2017, "2017/18",
-                               if_else((region == "EUR" | region == "EMR") & wk %in% wkno1  & yr == 2018, "2017/18",
-                                       if_else((region == "EUR" | region == "EMR") & wk %in% wkno2 & yr == 2018, "2018/19",
-                                               if_else((region == "EUR" | region == "EMR") & wk %in% wkno1 & yr == 2019, "2018/19",
-                                                       if_else((region == "EUR" | region == "EMR") & wk %in% wkno2 & yr == 2019, "2019/20",
-                                                               if_else((region == "EUR" | region == "EMR") & wk %in% wkno1 & yr == 2020, "2019/20",
-                                                                       if_else((region == "EUR" | region == "EMR") & wk %in% wkno2 & yr == 2020, "2020/21",
-                                                                               if_else((region == "EUR" | region == "EMR") & wk %in% wkno1 & yr == 2021, "2020/21",
-                                                                                       if_else((region == "EUR" | region == "EMR") & wk %in% wkno2 & yr == 2021, "2021/22",
-                                                                                               if_else((region == "EUR" | region == "EMR") & wk %in% wkno1 & yr == 2022, "2021/22",
-                                                                                                       if_else((region == "EUR" | region == "EMR") & wk %in% wkno2 & yr == 2022, "2022/23",
-                                                                                                               if_else((region == "EUR" | region == "EMR") & wk %in% wkno1 & yr == 2023, "2022/23", NA_character_))))))))))))
-  )
-
+  dplyr::group_by(region, yr) %>% 
+  mutate(seas = case_when(wk %in% wkno2 & yr == 2017 ~ "2017/18",
+                          wk %in% wkno1 & yr == 2018 ~ "2017/18",
+                          wk %in% wkno2 & yr == 2018 ~ "2018/19",
+                          wk %in% wkno1 & yr == 2019 ~ "2018/19",
+                          wk %in% wkno2 & yr == 2019 ~ "2019/20",
+                          wk %in% wkno1 & yr == 2020 ~ "2019/20",
+                          wk %in% wkno2 & yr == 2020 ~ "2020/21",
+                          wk %in% wkno1 & yr == 2021 ~ "2020/21",
+                          wk %in% wkno2 & yr == 2021 ~ "2021/22",
+                          wk %in% wkno1 & yr == 2022 ~ "2021/22",
+                          wk %in% wkno2 & yr == 2022 ~ "2022/23",
+                          wk %in% wkno1 & yr == 2023 ~ "2022/23",
+                          TRUE ~ NA_character_))
 
 #weekly seasonal RSV dynamics for each year
-print(
-  rsv_emr %>%
-  dplyr::filter(!is.na(seas)) %>% 
-  ggplot(aes(x = factor(wk, levels(factor(wk))[c(wkno)]), y = cases, group = seas, color = factor(seas))) +
-  geom_line(size = 1) +
-  facet_wrap(. ~ country, ncol = 2, scales = "free_y") +
-  labs(title = "Weekly seasonal RSV cases", subtitle = "(Stratified by Eastern Mediterranean country & year)", x = "Epi week", y = "RSV cases")  +
-  guides(color = guide_legend(title = "")) +
-  scale_x_discrete(breaks = seq(1, 52, 4)) +
-  theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
-  theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-  theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow"))
-)
+for (i in c("Oman", "Qatar")) {
+  plot26 = plotly::ggplotly(
+    rsv_all_p %>%
+      group_by(country) %>%
+      dplyr::mutate(yr = as.factor(yr), 
+                    wk = factor(wk, levels(factor(wk))[c(wkno)]),
+                    cases = round(cases, digits = 0),
+                    newDate = max(date, na.rm = TRUE),
+                    newWk = wk[which.max(date == newDate)],
+                    newCases = cases[which.max(date == newDate)]) %>%
+      ungroup() %>%
+      filter(!is.na(seas), country == i) %>%
+      
+      ggplot(aes(x = wk, y = cases,  group = seas, color = seas)) +
+      geom_line(size = 1) +
+      geom_point(aes(x = newWk, y = newCases, color = seas), size = 2) +
+      scale_colour_brewer(palette = 7, direction = 1) + 
+      labs(title = paste0("Weekly seasonal RSV cases in ", i, " by year"), x = "Epi week", y = "RSV cases") +
+      guides(color = guide_legend(title = "")) +
+      scale_x_discrete(breaks = seq(1, 52, 4)) +
+      theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
+      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
+      theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")))
+  
+  htmlwidgets::saveWidget(as_widget(plot26), here("output", "weekly_each_country", file = paste0("CountryWeekly_", i,".html")))
+  
+}
+
 
 #====================================================================
+#BEFORE AND AFTER COVID-19 RSV DYNAMICS BY COUNTRY
 #====================================================================
 
-#weekly seasonal RSV dynamics before and after COVID-19 by regions aggregated across all years
-print(
+#weekly seasonal RSV dynamics for each year
+wkno1 = 1:23
+wkno2 = 24:53
+wkno = c(24:53, 1:23)
+
+#weekly seasonal RSV dynamics before/after COVID-19 by regions aggregated across years
+rsv_all_q <-
   rsv_emr %>%
-  dplyr::mutate(covid = if_else(date < "2020-01-01", " Pre-C19 (2017-19)", if_else(year(date) == 2021, "2021", "2022"))) %>%  filter(!is.na(covid)) %>%
-  group_by(country, wk, covid) %>%
-  summarise(mcases = mean(cases, rm.na = TRUE)) %>%
-  ungroup() %>%
+  dplyr::group_by(region, yr) %>% 
+  mutate(seas = case_when(wk %in% wkno2 & yr == 2017 ~ "2017/18",
+                          wk %in% wkno1 & yr == 2018 ~ "2017/18",
+                          wk %in% wkno2 & yr == 2018 ~ "2018/19",
+                          wk %in% wkno1 & yr == 2019 ~ "2018/19",
+                          wk %in% wkno2 & yr == 2019 ~ "2019/20",
+                          wk %in% wkno1 & yr == 2020 ~ "2019/20",
+                          wk %in% wkno2 & yr == 2020 ~ "2020/21",
+                          wk %in% wkno1 & yr == 2021 ~ "2020/21",
+                          wk %in% wkno2 & yr == 2021 ~ "2021/22",
+                          wk %in% wkno1 & yr == 2022 ~ "2021/22",
+                          wk %in% wkno2 & yr == 2022 ~ "2022/23",
+                          wk %in% wkno1 & yr == 2023 ~ "2022/23",
+                          TRUE ~ NA_character_)) %>%
+
+  #compute the cases by covid period
+  dplyr::mutate(covid = if_else(seas == "2017/18" | seas == "2018/19" | seas == "2019/20", " PreCOVID (2017-19)",
+                                if_else(seas == "2021/22", "2021/22", 
+                                        if_else(seas == "2022/23", "2022/23", NA_character_)))) %>%
+  dplyr::filter(!is.na(covid)) %>%
+  dplyr::group_by(country, wk, covid) %>%
+  dplyr::mutate(cases = mean(cases, rm.na = TRUE)) %>%
+  dplyr::ungroup()
+
+#weekly seasonal RSV dynamics for each year
+for (i in c("Oman", "Qatar")) {
+  plot27 = plotly::ggplotly(
+    rsv_all_q %>%
+      group_by(country) %>%
+      dplyr::mutate(yr = as.factor(yr), 
+                    wk = factor(wk, levels(factor(wk))[c(wkno)]),
+                    cases = round(cases, digits = 0),
+                    newDate = max(date, na.rm = TRUE),
+                    newWk = wk[which.max(date == newDate)],
+                    newCases = cases[which.max(date == newDate)]) %>%
+      ungroup() %>%
+      filter(!is.na(seas), country == i) %>%
+      
+      ggplot(aes(x = wk, y = cases, group = covid, color = covid)) +
+      geom_line(size = 1) +
+      geom_point(aes(x = newWk, y = newCases, color = covid), size = 2) +
+      scale_colour_brewer(palette = 7, direction = 1) + 
+      labs(title = paste0("Weekly seasonal RSV cases in ", i, " by year"), x = "Epi week", y = "RSV cases") +
+      guides(color = guide_legend(title = "")) +
+      scale_x_discrete(breaks = seq(1, 52, 4)) +
+      theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
+      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
+      theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")))
   
-  ggplot(aes(x = factor(wk, levels(factor(wk))[c(wkno)]), y = mcases, group = covid, color = covid)) +
-  geom_line(size = 1) + 
-  scale_x_discrete(breaks = seq(1, 52, 4)) +
-  facet_wrap(. ~ country, ncol = 2, scales = "free_y") +
-  theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
-  theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-  labs(title = "Mean weekly seasonal RSV cases", subtitle = "(Stratified by Eastern Mediterranean country & Covid-19 phase)", x = "Epi week", y = "RSV cases") + 
-  theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")) +
-  guides(color = guide_legend(title = ""))
-)
+  htmlwidgets::saveWidget(as_widget(plot27), here("output", "covid_each_country", file = paste0("CountryCovid_", i,".html")))
   
+}
