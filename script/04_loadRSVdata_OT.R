@@ -56,7 +56,8 @@ str(rsvds)
 rsv_afr <- 
   rsvds %>%
   dplyr::filter(country %in% c("Central African Republic", "Côte d'Ivoire", "Madagascar", "South Africa"), 
-                year(date) >= 2017)
+                year(date) >= 2017) %>%
+  dplyr::mutate(country = if_else(country == "Côte d'Ivoire", "Ivory Coast", country))
 
 #'Not defined' may include sentinel or non-sentinel data
 #'properly index by week to have 0 or some observed number of cases in sequential weeks

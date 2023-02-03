@@ -17,7 +17,7 @@ rsv_afr %>%
   dplyr::mutate(cases = round(zoo::rollmean(cases, k = 3, fill = 0, align = 'right'))) %>%
   dplyr::ungroup()
 
-for (i in c("Central African Republic", "Côte d'Ivoire", "Madagascar", "South Africa")) {
+for (i in c("Central African Republic", "Ivory Coast", "Madagascar", "South Africa")) {
 plot13 = plotly::ggplotly(
   country_year %>%
         filter(country == i) %>%
@@ -36,7 +36,7 @@ unlink(paste0(here("output", "timeseries_each_country", paste0("timeseries_",i,"
 #====================================================================
 
 #weekly seasonal RSV dynamics for each year
-for (i in c("Central African Republic", "Côte d'Ivoire", "Madagascar", "South Africa")) {
+for (i in c("Central African Republic", "Ivory Coast", "Madagascar", "South Africa")) {
   plot14 = plotly::ggplotly(
     rsv_afr %>%
       group_by(country) %>%
@@ -69,7 +69,7 @@ for (i in c("Central African Republic", "Côte d'Ivoire", "Madagascar", "South A
 #====================================================================
 
 #weekly seasonal RSV dynamics before and after COVID-19 aggregated across preCOVID-19
-for (i in c("Central African Republic", "Côte d'Ivoire", "Madagascar", "South Africa")) {
+for (i in c("Central African Republic", "Ivory Coast", "Madagascar", "South Africa")) {
   plot15 = plotly::ggplotly(
     rsv_afr %>%
       dplyr::mutate(covid = if_else(date < "2020-01-01", " PreCOVID (2017-19)", 
