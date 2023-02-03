@@ -4,10 +4,10 @@
 
 
 #====================================================================
-#YEAR ON YEAR RSV DYNAMICS BY REGION
+#TIME SERIES RSV DYNAMICS BY EACH REGION
 #====================================================================
 
-#weekly year on year RSV cases
+#RSV cases time series
 reg_year <- 
 rsv_all %>%
   dplyr::group_by(region, date, wk) %>%
@@ -16,23 +16,6 @@ rsv_all %>%
   dplyr::group_by(region) %>%
   dplyr::mutate(cases = round(zoo::rollmean(cases, k = 3, fill = 0, align = 'right'))) %>%
   dplyr::ungroup()
-
-#all WHO regions
-plot1 <-
-plotly::ggplotly(
-reg_year %>%
-  ggplot(aes(x = date, y = cases)) +
-  geom_rect(aes(xmin = date(now())-30.44, xmax = date(now()), ymin = 0, ymax = Inf), fill = "grey70", alpha = 0.8) +
-  geom_line() + 
-  facet_wrap(. ~ region, scales = "free_y") +
-  scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
-  theme_bw(base_size = 11, base_family = "Lato", base_line_size = 1.5) +
-  theme(plot.title = element_text(size = 14)) +
-  theme(strip.background = element_rect(fill = "white"), strip.text.x = element_text(size = 16)) +
-  labs(title = "14-days rolling average RSV cases, 2017+", x = "Reporting date", y = "RSV cases"))
-
-htmlwidgets::saveWidget(as_widget(plot1), here("output", "yearOnyear_all_region", file = "all_region_yearOnyear.html"))
-
 
 #by each region
 for (i in c("Africa", "Americas", "Eastern Mediterranean", "Europe", "South East Asia", "Western Pacific")) {
@@ -46,12 +29,13 @@ for (i in c("Africa", "Americas", "Eastern Mediterranean", "Europe", "South East
       theme_bw(base_size = 11, base_family = "Lato", base_line_size = 1.5) +
       labs(title = paste0("14-days rolling average RSV cases, 2017+ in ", i), x = "Reporting date", y = "RSV cases"))
   
-  htmlwidgets::saveWidget(as_widget(plot2), here("output", "yearOnyear_each_region", file = paste0("RegionYearly_", i,".html")))
+  htmlwidgets::saveWidget(as_widget(plot2), here("output", "timeseries_each_region", file = paste0("timeseries_", i,".html")))
+  unlink(paste0(here("output", "timeseries_each_region", paste0("timeseries_",i,"_files"))), recursive = TRUE) #delete metadata
 }
 
 
 #====================================================================
-#WEEKLY RSV DYNAMICS BY REGION
+#WEEKLY RSV DYNAMICS BY EACH REGION
 #====================================================================
 
 #weekly seasonal RSV dynamics for each year
@@ -95,7 +79,8 @@ for (i in c("Africa", "Americas", "South East Asia", "Western Pacific")) {
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
       theme(legend.position = "bottom", strip.background = element_rect(fill = "white")))
   
-htmlwidgets::saveWidget(as_widget(plot3), here("output", "weekly_each_region", file = paste0("RegionWeekly_", i,".html")))
+htmlwidgets::saveWidget(as_widget(plot3), here("output", "weekly_each_region", file = paste0("weekly_", i,".html")))
+unlink(paste0(here("output", "weekly_each_region", paste0("weekly_",i,"_files"))), recursive = TRUE) #delete metadata
 }
 
 for (i in c("Europe", "Eastern Mediterranean")) {
@@ -114,11 +99,13 @@ for (i in c("Europe", "Eastern Mediterranean")) {
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
       theme(legend.position = "bottom", strip.background = element_rect(fill = "white")))
   
-  htmlwidgets::saveWidget(as_widget(plot4), here("output", "weekly_each_region", file = paste0("RegionWeekly_", i,".html")))
+  htmlwidgets::saveWidget(as_widget(plot4), here("output", "weekly_each_region", file = paste0("weekly_", i,".html")))
+  unlink(paste0(here("output", "weekly_each_region", paste0("weekly_",i,"_files"))), recursive = TRUE) #delete metadata
 }
+
  
 #====================================================================
-#BEFORE AND AFTER COVID-19 RSV DYNAMICS BY REGION
+#COVID-19 IMPACT RSV DYNAMICS BY REGION
 #====================================================================
  
 #weekly seasonal RSV dynamics before/after COVID-19 by regions aggregated across years
@@ -176,7 +163,8 @@ for (i in c("Africa", "Americas", "South East Asia", "Western Pacific")) {
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
       theme(legend.position = "bottom", strip.background = element_rect(fill = "white")))
   
-  htmlwidgets::saveWidget(as_widget(plot5), here("output", "covid_each_region", file = paste0("RegionCovid_", i,".html")))
+  htmlwidgets::saveWidget(as_widget(plot5), here("output", "covidimpact_each_region", file = paste0("covidimpact_", i,".html")))
+  unlink(paste0(here("output", "covidimpact_each_region", paste0("covidimpact_",i,"_files"))), recursive = TRUE) #delete metadata
 }
 
 for (i in c("Europe", "Eastern Mediterranean")) {
@@ -195,5 +183,6 @@ for (i in c("Europe", "Eastern Mediterranean")) {
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
       theme(legend.position = "bottom", strip.background = element_rect(fill = "white")))
   
-  htmlwidgets::saveWidget(as_widget(plot6), here("output", "covid_each_region", file = paste0("RegionCovid_", i,".html")))
+  htmlwidgets::saveWidget(as_widget(plot6), here("output", "covidimpact_each_region", file = paste0("covidimpact_", i,".html")))
+  unlink(paste0(here("output", "covidimpact_each_region", paste0("covidimpact_",i,"_files"))), recursive = TRUE) #delete metadata
 }

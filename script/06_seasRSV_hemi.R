@@ -3,10 +3,10 @@
 #global reemergence of RSV onset, duration and peak
 
 #====================================================================
-#YEAR ON YEAR RSV DYNAMICS BY HEMISPHERE
+#TIME SERIES RSV DYNAMICS BY HEMISPHERE
 #====================================================================
 
-#weekly year on year RSV cases
+#time series of RSV cases
 hemi_year <- 
   rsv_all %>%
   dplyr::group_by(hemi, date, wk) %>%
@@ -15,23 +15,6 @@ hemi_year <-
   dplyr::group_by(hemi) %>%
   dplyr::mutate(cases = round(zoo::rollmean(cases, k = 3, fill = 0, align = 'right'))) %>%
   dplyr::ungroup()
-
-#both hemispheres
-plot7 <-
-  plotly::ggplotly(
-    hemi_year %>%
-      ggplot(aes(x = date, y = cases)) +
-      geom_rect(aes(xmin = date(now())-30.44, xmax = date(now()), ymin = 0, ymax = Inf), fill = "grey70", alpha = 0.8) +
-      geom_line() + 
-      facet_wrap(. ~ hemi, scales = "free_y") +
-      scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
-      theme_bw(base_size = 11, base_family = "Lato", base_line_size = 1.5) +
-      theme(plot.title = element_text(size = 14)) +
-      theme(strip.background = element_rect(fill = "white"), strip.text.x = element_text(size = 16)) +
-      labs(title = "14-days rolling average RSV cases, 2017+", x = "Reporting date", y = "RSV cases"))
-
-htmlwidgets::saveWidget(as_widget(plot7), here("output", "yearOnyear_all_hemisphere", file = "all_hemisphere_yearOnyear.html"))
-
 
 #by each hemisphere
 for (i in c("Northern hemisphere", "Southern hemisphere")) {
@@ -45,12 +28,14 @@ for (i in c("Northern hemisphere", "Southern hemisphere")) {
       theme_bw(base_size = 11, base_family = "Lato", base_line_size = 1.5) +
       labs(title = paste0("14-days rolling average RSV cases, 2017+ in ", i), x = "Reporting date", y = "RSV cases"))
   
-  htmlwidgets::saveWidget(as_widget(plot8), here("output", "yearOnyear_each_hemisphere", file = paste0("HemisphereYearly_", i,".html")))
+  htmlwidgets::saveWidget(as_widget(plot8), here("output", "timeseries_each_hemisphere", file = paste0("timeseries_", i,".html")))
+  unlink(paste0(here("output", "timeseries_each_hemisphere", paste0("timeseries_",i,"_files"))), recursive = TRUE) #delete metadata
+  
 }
 
 
 #====================================================================
-#WEEKLY RSV DYNAMICS BY HEMISPHERE
+#WEEKLY RSV DYNAMICS BY EACH HEMISPHERE
 #====================================================================
 
 #weekly seasonal RSV dynamics for each year
@@ -94,7 +79,8 @@ for (i in c("Southern hemisphere")) {
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
       theme(legend.position = "bottom", strip.background = element_rect(fill = "white")))
   
-  htmlwidgets::saveWidget(as_widget(plot9), here("output", "weekly_each_hemisphere", file = paste0("HemisphereWeekly_", i,".html")))
+  htmlwidgets::saveWidget(as_widget(plot9), here("output", "weekly_each_hemisphere", file = paste0("weekly_", i,".html")))
+  unlink(paste0(here("output", "weekly_each_hemisphere", paste0("weekly_",i,"_files"))), recursive = TRUE) #delete metadata
 }
 
 for (i in c("Northern hemisphere")) {
@@ -113,12 +99,13 @@ for (i in c("Northern hemisphere")) {
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
       theme(legend.position = "bottom", strip.background = element_rect(fill = "white")))
   
-  htmlwidgets::saveWidget(as_widget(plot10), here("output", "weekly_each_hemisphere", file = paste0("HemisphereWeekly_", i,".html")))
+  htmlwidgets::saveWidget(as_widget(plot10), here("output", "weekly_each_hemisphere", file = paste0("weekly_", i,".html")))
+  unlink(paste0(here("output", "weekly_each_hemisphere", paste0("weekly_",i,"_files"))), recursive = TRUE) #delete metadata
 }
 
 
 #====================================================================
-#BEFORE AND AFTER COVID-19 RSV DYNAMICS BY HEMISPHERE
+#COVID-19 IMPACT ON RSV DYNAMICS BY HEMISPHERE
 #====================================================================
 
 #weekly seasonal RSV dynamics before/after COVID-19 by regions aggregated across years
@@ -176,7 +163,8 @@ for (i in c("Southern hemisphere")) {
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
       theme(legend.position = "bottom", strip.background = element_rect(fill = "white")))
   
-  htmlwidgets::saveWidget(as_widget(plot11), here("output", "covid_each_hemisphere", file = paste0("HemisphereCovid_", i,".html")))
+  htmlwidgets::saveWidget(as_widget(plot11), here("output", "covidimpact_each_hemisphere", file = paste0("covidimpact_", i,".html")))
+  unlink(paste0(here("output", "covidimpact_each_hemisphere", paste0("covidimpact_",i,"_files"))), recursive = TRUE) #delete metadata
 }
 
 for (i in c("Northern hemisphere")) {
@@ -195,5 +183,6 @@ for (i in c("Northern hemisphere")) {
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
       theme(legend.position = "bottom", strip.background = element_rect(fill = "white")))
   
-  htmlwidgets::saveWidget(as_widget(plot12), here("output", "covid_each_hemisphere", file = paste0("HemisphereCovid_", i,".html")))
+  htmlwidgets::saveWidget(as_widget(plot12), here("output", "covidimpact_each_hemisphere", file = paste0("covidimpact_", i,".html")))
+  unlink(paste0(here("output", "covidimpact_each_hemisphere", paste0("covidimpact_",i,"_files"))), recursive = TRUE) #delete metadata
 }

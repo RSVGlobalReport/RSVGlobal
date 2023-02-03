@@ -3,33 +3,36 @@
 #global reemergence of RSV onset, duration and peak
 
 #====================================================================
-#YEAR ON YEAR RSV DYNAMICS IN EASTERN MEDITERRENEAN
+#TIME SERIES OF RSV DYNAMICS BY EACH COUNTRY IN EASTERM MEDITERRENEAN
 #====================================================================
 
-#weekly year on year RSV cases
-plot25 = plotly::ggplotly(
+#time series of RSV cases
+country_year <-
   rsv_emr %>%
-    dplyr::group_by(country) %>%
-    dplyr::mutate(cases = round(zoo::rollmean(cases, k = 3, fill = 0, align = 'right'), digits = 0),
-                  newDate = max(date, na.rm = TRUE),
-                  newCases = cases[which.max(date == newDate)]) %>%
-    dplyr::ungroup() %>%
-    
-    ggplot(aes(x = date, y = cases)) +
-    geom_line() + 
-    geom_point(aes(x = newDate, y = newCases), color = "red", size = 1.5) +
-    facet_wrap(. ~ country, ncol = 2, scales = "free_y") +
-    scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
-    theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
-    theme(strip.background = element_rect(fill = "white")) +
-    theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-    labs(title = "14-days Rolling Average RSV cases in Eastern Mediterrenean, from 2017+ years", x = "Date", y = "RSV cases"))
+  dplyr::group_by(country, date, wk) %>%
+  dplyr::summarise(cases = mean(cases, na.rm = TRUE)) %>%
+  dplyr::ungroup() %>%
+  dplyr::group_by(country) %>%
+  dplyr::mutate(cases = round(zoo::rollmean(cases, k = 3, fill = 0, align = 'right'))) %>%
+  dplyr::ungroup()
 
-htmlwidgets::saveWidget(as_widget(plot25), here("output", "yearOnyear_all_eastern_mediterrenean", file = "all_eastern_mediterrenean_yearOnyear.html"))
+for (i in c("Oman", "Qatar")) {
+  plot25 = plotly::ggplotly(
+    country_year %>%
+      filter(country == i) %>%
+      ggplot(aes(x = date, y = cases)) +
+      geom_line() + 
+      scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
+      theme_bw(base_size = 11, base_family = "Lato", base_line_size = 1.5) +
+      labs(title = paste0("14-days rolling average RSV cases, 2017+ in ", i), x = "Reporting date", y = "RSV cases"))
+  
+  htmlwidgets::saveWidget(as_widget(plot25), here("output", "timeseries_each_country", file = paste0("timeseries_", i,".html")))
+  unlink(paste0(here("output", "timeseries_each_country", paste0("timeseries_",i,"_files"))), recursive = TRUE) #delete metadata
+}
 
 
 #====================================================================
-#WEEKLY RSV DYNAMICS BY COUNTRY
+#WEEKLY RSV DYNAMICS BY EACH COUNTRY IN EASTERM MEDITERRENEAN
 #====================================================================
 
 #weekly seasonal RSV dynamics for each year
@@ -79,13 +82,13 @@ for (i in c("Oman", "Qatar")) {
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
       theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")))
   
-  htmlwidgets::saveWidget(as_widget(plot26), here("output", "weekly_each_country", file = paste0("CountryWeekly_", i,".html")))
-  
+  htmlwidgets::saveWidget(as_widget(plot26), here("output", "weekly_each_country", file = paste0("weekly_", i,".html")))
+  unlink(paste0(here("output", "weekly_each_country", paste0("weekly_",i,"_files"))), recursive = TRUE) #delete metadata
 }
 
 
 #====================================================================
-#BEFORE AND AFTER COVID-19 RSV DYNAMICS BY COUNTRY
+#COVID-19 IMPACT ON RSV DYNAMICS BY EACH COUNTRY IN EASTERM MEDITERRENEAN
 #====================================================================
 
 #weekly seasonal RSV dynamics for each year
@@ -145,6 +148,6 @@ for (i in c("Oman", "Qatar")) {
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
       theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")))
   
-  htmlwidgets::saveWidget(as_widget(plot27), here("output", "covid_each_country", file = paste0("CountryCovid_", i,".html")))
-  
+  htmlwidgets::saveWidget(as_widget(plot27), here("output", "covidimpact_each_country", file = paste0("covidimpact_", i,".html")))
+  unlink(paste0(here("output", "covidimpact_each_country", paste0("covidimpact_",i,"_files"))), recursive = TRUE) #delete metadata
 }

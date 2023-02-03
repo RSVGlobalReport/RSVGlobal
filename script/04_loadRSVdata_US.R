@@ -282,3 +282,9 @@ rsv_usa_nat <-
   dplyr::filter(yr >= 2017) %>%
   dplyr::distinct(country, date, .keep_all = TRUE) %>%
   mutate(regionUS = "National")
+
+#====================================================================
+#====================================================================
+
+#combine dataset for the national and region
+rsv_usa <- dplyr::rows_append(rsv_usa_nat, rsv_usa_reg)
