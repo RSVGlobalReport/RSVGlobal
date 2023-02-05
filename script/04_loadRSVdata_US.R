@@ -287,4 +287,19 @@ rsv_usa_nat <-
 #====================================================================
 
 #combine dataset for the national and region
-rsv_usa <- dplyr::rows_append(rsv_usa_nat, rsv_usa_reg)
+#rsv_usa <- dplyr::rows_append(rsv_usa_nat, rsv_usa_reg)
+
+#====================================================================
+#====================================================================
+
+#alternatively ignore the independent National US dataset and
+#add up all regional datasets to make national then combine with each region in single dataset
+rsv_usa <-
+rsv_usa_reg %>% 
+  dplyr::select(everything(), -regionUS) %>% 
+  dplyr::group_by(hemi, region, country, date, yr, mo, wk) %>% 
+  dplyr::summarise(cases = sum(cases, na.rm = TRUE)) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(regionUS = "National") %>%
+  dplyr::select(hemi:date, cases, yr, mo, wk, regionUS) %>%
+  dplyr::rows_append(rsv_usa_reg)

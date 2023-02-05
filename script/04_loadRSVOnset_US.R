@@ -16,22 +16,50 @@
 #, rsv_usa_nat %>% select(hemi:date, yr, mo, wk, cases)
 
 #drop country and rename within US regions as country to adapt the code below
-rsv_usa <-
-rows_append(
-rsv_usa_nat %>% select(everything(), -country) %>% rename("country" = "regionUS"),
-rsv_usa_reg %>% select(everything(), -country) %>% rename("country" = "regionUS")
-)
-
 X <- rsv_usa %>%
-  select(country, yr, wk, cases) %>%
-  group_by(country, yr) %>%
-  mutate(tcases = sum(cases, na.rm = TRUE)) %>%
-  filter(wk <=52, yr != 2020, yr !=2023, tcases >99) %>% 
-  select(country, yr, wk, cases) %>%
-  arrange(country, yr, wk, cases) %>%
+  dplyr::mutate(country = regionUS) %>%
+  dplyr::select(country, yr, wk, cases) %>%
+  
+  #ensure annual cases are 100+ only
+  dplyr::group_by(country, yr) %>%
+  dplyr::mutate(tcases = sum(cases, na.rm = TRUE)) %>%
+  ungroup() %>%
+  dplyr::filter(wk <=52, yr != 2020, yr !=2023, tcases >99) %>% 
+  dplyr::select(everything(), -tcases) %>%
+  
+  #for temperate countries, ensure seasonality starts from week 24
+  dplyr::group_by(country, yr) %>%
+  dplyr::mutate(wk = c(53:75, 24:52)) %>%
+  ungroup() %>%
+
+  dplyr::arrange(country, yr, wk, cases) %>%
   split(list(.$country, .$yr))
 
-#delete empty country.yr dataframes from list X (they have less than threshold total cases [tcases] throughout the year)
+
+#extract country and yr from original dataset to merge with onset dataset
+rsv_onset_us <- 
+  rsv_onset_us %>%
+  left_join(
+    rsv_usa %>%
+      select(hemi, region, country, yr, wk, cases) %>%
+      group_by(hemi, region, country, yr) %>%
+      mutate(tcases = sum(cases, na.rm = TRUE)) %>%
+      filter(wk <=52, yr != 2020, yr !=2023, tcases >99) %>% 
+      summarise(tot_cases = sum(cases)) %>%
+      ungroup() %>%
+      mutate(ncountry = 1:n()) %>%
+      select(ncountry, hemi, region, country, yr)
+  )
+
+
+
+
+
+
+
+
+
+#delete empty country.yr data frames from list X (they have less than threshold total cases [tcases] throughout the year)
 X <- X[unlist(lapply(X, nrow) != 0)]
 
 #function to calculate derivative and assist derivative calculation

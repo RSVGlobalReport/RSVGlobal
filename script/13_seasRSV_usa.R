@@ -157,3 +157,4 @@ for (i in c("National", "Mid West", "West", "South", "North East")) {
   htmlwidgets::saveWidget(as_widget(plot33), here("output", "covidimpact_each_country", file = paste0("covidimpact_USA_", i,".html")))
   unlink(paste0(here("output", "covidimpact_each_country", paste0("covidimpact_USA_",i,"_files"))), recursive = TRUE) #delete metadata
 }
+
