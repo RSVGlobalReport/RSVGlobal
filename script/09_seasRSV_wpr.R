@@ -19,12 +19,19 @@ country_year <-
 for (i in c("Australia", "Japan", "Mongolia", "Malaysia")) {
   plot19 = plotly::ggplotly(
     country_year %>%
+      group_by(country) %>%
+      mutate(newDate = max(date, na.rm = TRUE), 
+             newCases = cases[which.max(date == newDate)]) %>%
+      ungroup() %>%
       filter(country == i) %>%
+      
       ggplot(aes(x = date, y = cases)) +
       geom_line() + 
+      geom_point(aes(x = newDate, y = newCases), color = "red", size = 2.5) +
       scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
       theme_bw(base_size = 11, base_family = "Lato", base_line_size = 1.5) +
-      labs(title = paste0("14-days rolling average RSV cases, 2017+ in ", i), x = "Reporting date", y = "RSV cases"))
+      labs(title = paste0("14-days rolling average RSV cases, 2017+ in ", i), x = "Reporting date", y = "RSV cases"))  %>%
+    layout(hovermode = "x unified")
   
   htmlwidgets::saveWidget(as_widget(plot19), here("output", "timeseries_each_country", file = paste0("timeseries_", i,".html")))
   unlink(paste0(here("output", "timeseries_each_country", paste0("timeseries_",i,"_files"))), recursive = TRUE) #delete metadata

@@ -19,12 +19,19 @@ country_year <-
 for (i in c("National", "Mid West", "West", "South", "North East")) {
   plot31 = plotly::ggplotly(
     country_year %>%
+      group_by(regionUS) %>%
+      mutate(newDate = max(date, na.rm = TRUE), 
+             newCases = cases[which.max(date == newDate)]) %>%
+      ungroup() %>%
       filter(regionUS == i) %>%
+      
       ggplot(aes(x = date, y = cases)) +
       geom_line() + 
+      geom_point(aes(x = newDate, y = newCases), color = "red", size = 2.5) +
       scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
       theme_bw(base_size = 11, base_family = "Lato", base_line_size = 1.5) +
-      labs(title = paste0("14-days rolling average RSV cases, 2017+ in ", i, " United States"), x = "Reporting date", y = "RSV cases"))
+      labs(title = paste0("14-days rolling average RSV cases, 2017+ in ", i, " United States"), x = "Reporting date", y = "RSV cases")) %>%
+    layout(hovermode = "x unified")
   
   htmlwidgets::saveWidget(as_widget(plot31), here("output", "timeseries_each_country", file = paste0("timeseries_USA_", i,".html")))
   unlink(paste0(here("output", "timeseries_each_country", paste0("timeseries_USA_",i,"_files"))), recursive = TRUE) #delete metadata
@@ -140,7 +147,7 @@ for (i in c("National", "Mid West", "West", "South", "North East")) {
       geom_line(size = 1) +
       geom_point(aes(x = newWk, y = newCases, color = covid), size = 2) +
       scale_colour_brewer(palette = 7, direction = 1) + 
-      labs(title = paste0("Weekly seasonal RSV cases in the United States (", i, ") by year"), x = "Epi week", y = "RSV cases") +
+      labs(title = paste0("(Mean) weekly seasonal RSV cases in the United States (", i, ") by year"), x = "Epi week", y = "RSV cases") +
       guides(color = guide_legend(title = "")) +
       scale_x_discrete(breaks = seq(1, 52, 4)) +
       theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +

@@ -22,10 +22,8 @@ for (i in c("Africa", "Americas", "Eastern Mediterranean", "Europe", "South East
   
   plot2 = plotly::ggplotly(
     reg_year %>%
-      group_by(region) %>%
       mutate(newDate = max(date, na.rm = TRUE),
              newCases = cases[which.max(date == newDate)]) %>%
-      ungroup() %>%
       filter(region == i) %>%
       ggplot(aes(x = date, y = cases)) +
       geom_line() + 
@@ -198,7 +196,7 @@ for (i in c("Africa", "Americas", "South East Asia", "Western Pacific")) {
       geom_line(size = 1) +
       geom_point(aes(x = newWk, y = newCases, color = period), size = 2.5) +
       scale_colour_brewer(palette = 1, direction = 1) + 
-      labs(title = paste0("Weekly seasonal RSV cases in ", i), x = "Epi week", y = "RSV cases") +
+      labs(title = paste0("Mean weekly seasonal RSV cases in ", i), x = "Epi week", y = "RSV cases") +
       guides(color = guide_legend(title = "")) +
       scale_x_continuous(breaks = seq(1, 53, 4)) +
       theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
@@ -225,7 +223,7 @@ for (i in c("Europe", "Eastern Mediterranean")) {
       geom_line(size = 1) +
       geom_point(aes(x = newWk, y = newCases, color = period), size = 2.5) +
       scale_colour_brewer(palette = 1, direction = 1) + 
-      labs(title = paste0("Weekly seasonal RSV cases in ", i), x = "Epi week", y = "RSV cases") +
+      labs(title = paste0("Mean weekly seasonal RSV cases in ", i), x = "Epi week", y = "RSV cases") +
       guides(color = guide_legend(title = "")) +
       scale_x_discrete(breaks = seq(1, 52, 4)) +
       theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
