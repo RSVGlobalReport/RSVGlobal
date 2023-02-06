@@ -16,48 +16,27 @@
 #, rsv_usa_nat %>% select(hemi:date, yr, mo, wk, cases)
 
 #drop country and rename within US regions as country to adapt the code below
-X <- rsv_usa %>%
+W <- rsv_usa %>%
   dplyr::mutate(country = regionUS) %>%
   dplyr::select(country, yr, wk, cases) %>%
   
-  #ensure annual cases are 100+ only
+#ensure annual cases are 100+ only
   dplyr::group_by(country, yr) %>%
   dplyr::mutate(tcases = sum(cases, na.rm = TRUE)) %>%
   ungroup() %>%
   dplyr::filter(wk <=52, yr != 2020, yr !=2023, tcases >99) %>% 
   dplyr::select(everything(), -tcases) %>%
   
-  #for temperate countries, ensure seasonality starts from week 24
+#for temperate countries, ensure seasonality starts from week 24
   dplyr::group_by(country, yr) %>%
   dplyr::mutate(wk = c(53:75, 24:52)) %>%
   ungroup() %>%
+  dplyr::arrange(country, yr, wk, cases)
 
-  dplyr::arrange(country, yr, wk, cases) %>%
+#split the dataset by country/regionUS and year to form list of datasets
+X <- 
+  W %>%  
   split(list(.$country, .$yr))
-
-
-#extract country and yr from original dataset to merge with onset dataset
-rsv_onset_us <- 
-  rsv_onset_us %>%
-  left_join(
-    rsv_usa %>%
-      select(hemi, region, country, yr, wk, cases) %>%
-      group_by(hemi, region, country, yr) %>%
-      mutate(tcases = sum(cases, na.rm = TRUE)) %>%
-      filter(wk <=52, yr != 2020, yr !=2023, tcases >99) %>% 
-      summarise(tot_cases = sum(cases)) %>%
-      ungroup() %>%
-      mutate(ncountry = 1:n()) %>%
-      select(ncountry, hemi, region, country, yr)
-  )
-
-
-
-
-
-
-
-
 
 #delete empty country.yr data frames from list X (they have less than threshold total cases [tcases] throughout the year)
 X <- X[unlist(lapply(X, nrow) != 0)]
@@ -77,7 +56,7 @@ Gmodels <- list()
 set.seed = 1988
 
 #run the GAM models where smoothing parameter/knots are automatically selected via a cross validation method
-for (i in 1:length(X)) {
+for (i in names(X)) {
 Gmodels[[i]] <- gam(cases ~ s(x = wk, bs = "ps"), 
                          family = poisson, 
                          method = "REML", 
@@ -93,7 +72,7 @@ onset.samples <- list()
 
 #uns simulations on an outbreak GAM to estimate time series outbreak outcomes 
 #and returns estimated time series outcomes for each simulation.
-for (i in 1:length(X)){
+for (i in names(X)){
   cases.samples[[i]] = pspline.sample.timeseries(Gmodels[[i]], 
                                                  data.frame(wk = t), 
                                                  pspline.outbreak.cases, 
@@ -101,7 +80,7 @@ for (i in 1:length(X)){
   }
 
 #iterate for each country and year, compute first and second derivative
-for (i in 1:length(X)){
+for (i in names(X)){
   onset.samples[[i]] = cases.samples[[i]] %>% 
     group_by(pspline.sample) %>% # for each sample do the following
     do((function(data){
@@ -124,29 +103,32 @@ for (i in 1:length(X)){
     ungroup()
 }
 
-#create an empty matrix to hold onset timing data
-rsv_onset_us <- matrix(data = NA, nrow = length(X), ncol = 4)
-colnames(rsv_onset_us) <- c("epiwk","l_epiwk","u_epiwk","ncountry")
+#compute mean, low and upper 95%CI for onset by country and year
+rsv_onset_us <-
+bind_rows(onset.samples, .id = "id") %>%
+  mutate(yr = str_sub(id, -4, -1),
+         country = word(id, 1, sep = "\\.")) %>%
+  select(everything(), -id) %>%
+  group_by(country, yr) %>%
+  summarise(epiwk = mean(onset, 0.025),
+            l_epiwk = quantile(onset, 0.025),
+            u_epiwk = quantile(onset, 0.975)) %>%
+  ungroup()
 
-#update the matrix with estimated values and convert to data frame
-for (i in 1:length(X)){
-  rsv_onset_us[i,1] <- mean(onset.samples[[i]]$onset)
-  rsv_onset_us[i,2] <- quantile(onset.samples[[i]]$onset,0.025)
-  rsv_onset_us[i,3] <- quantile(onset.samples[[i]]$onset,0.975) 
-  rsv_onset_us[i,4] <- i}
-rsv_onset_us <- as.data.frame(rsv_onset_us)
-
-#extract country and yr from original dataset to merge with onset dataset
-rsv_onset_us <- 
-  rsv_onset_us %>%
-  left_join(
-    rsv_usa %>%
-      select(hemi, region, country, yr, wk, cases) %>%
-      group_by(hemi, region, country, yr) %>%
-      mutate(tcases = sum(cases, na.rm = TRUE)) %>%
-      filter(wk <=52, yr != 2020, yr !=2023, tcases >99) %>% 
-      summarise(tot_cases = sum(cases)) %>%
-      ungroup() %>%
-      mutate(ncountry = 1:n()) %>%
-      select(ncountry, hemi, region, country, yr)
-)
+#compute mean, low and upper 95%CI for onset by country and preCOVID-19 vs each year after COVID-19 year
+rsv_onset_us_cov <-
+  bind_rows(onset.samples, .id = "id") %>%
+  mutate(yr = str_sub(id, -4, -1),
+         country = word(id, 1, sep = "\\.")) %>%
+  select(everything(), -id) %>%
+  mutate(covper = if_else(yr <=2019, "preCOVID-19",
+                          if_else(yr == 2021, "2021/22",
+                                  if_else(yr == 2022, "2022/23",
+                                          if_else(yr == 2023, "2023/24",
+                                                  if_else(yr == 2024, "2024/25",
+                                                          if_else(yr == 2025, "2025/26", NA_character_))))))) %>%
+  group_by(country, covper) %>%
+  summarise(epiwk = mean(onset, 0.025),
+            l_epiwk = quantile(onset, 0.025),
+            u_epiwk = quantile(onset, 0.975)) %>%
+  ungroup()
