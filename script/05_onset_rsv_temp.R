@@ -16,22 +16,33 @@
 #, rsv_usa_nat %>% select(hemi:date, yr, mo, wk, cases)
 
 #drop country and rename within US regions as country to adapt the code below
-W <- rsv_usa %>%
-  dplyr::mutate(country = regionUS) %>%
+W <-
+  left_join(rsv_all, climate) %>%
+  filter(climate == "temperate") %>%
   dplyr::select(country, yr, wk, cases) %>%
+  dplyr::arrange(country, yr, wk) %>%
+  dplyr::filter(wk <=52) %>%
+  dplyr::mutate(yr = case_when((wk %in% 24:52 & yr == 2017) | (wk %in% 1:23 & yr == 2018) ~ "2017/18",
+                               (wk %in% 24:52 & yr == 2018) | (wk %in% 1:23 & yr == 2019) ~ "2018/19",
+                               (wk %in% 24:52 & yr == 2019) | (wk %in% 1:23 & yr == 2020) ~ "2019/20",
+                               (wk %in% 24:52 & yr == 2020) | (wk %in% 1:23 & yr == 2021) ~ "2020/21",
+                               (wk %in% 24:52 & yr == 2021) | (wk %in% 1:23 & yr == 2022) ~ "2021/22",
+                               (wk %in% 24:52 & yr == 2022) | (wk %in% 1:23 & yr == 2023) ~ "2022/23",
+                               (wk %in% 24:52 & yr == 2023) | (wk %in% 1:23 & yr == 2024) ~ "2023/24",
+                               (wk %in% 24:52 & yr == 2024) | (wk %in% 1:23 & yr == 2025) ~ "2024/25",
+                               (wk %in% 24:52 & yr == 2025) | (wk %in% 1:23 & yr == 2026) ~ "2025/26",
+                               (wk %in% 24:52 & yr == 2026) | (wk %in% 1:23 & yr == 2027) ~ "2026/27",
+                               TRUE ~ NA_character_)) %>%
+  dplyr::filter(!is.na(yr)) %>%
   
-#ensure annual cases are 100+ only
+  #for temperate countries, ensure seasonality starts from week 24 and ensure annual cases are 100+ only
   dplyr::group_by(country, yr) %>%
-  dplyr::mutate(tcases = sum(cases, na.rm = TRUE)) %>%
-  ungroup() %>%
-  dplyr::filter(wk <=52, yr != 2020, yr !=2023, tcases >99) %>% 
-  dplyr::select(everything(), -tcases) %>%
-  
-#for temperate countries, ensure seasonality starts from week 24
-  dplyr::group_by(country, yr) %>%
-  dplyr::mutate(wk = c(53:75, 24:52)) %>%
-  ungroup() %>%
-  dplyr::arrange(country, yr, wk, cases)
+  mutate(wk = seq.int(from = 24, by = 1, length.out = n()),
+         tcases = sum(cases, na.rm = TRUE)) %>%
+  dplyr::ungroup() %>%
+  dplyr::filter(yr != "2020/21",  tcases >199) %>% #filter out covid period
+  dplyr::select(country, yr, wk, cases)
+
 
 #split the dataset by country/regionUS and year to form list of datasets
 X <- 
@@ -57,12 +68,12 @@ set.seed = 1988
 
 #run the GAM models where smoothing parameter/knots are automatically selected via a cross validation method
 for (i in names(X)) {
-Gmodels[[i]] <- gam(cases ~ s(x = wk, bs = "ps"), 
-                         family = poisson, 
-                         method = "REML", 
-                         control = list(maxit =100000),
-                         data = X[[i]]
-                         )
+  Gmodels[[i]] <- gam(cases ~ s(x = wk, bs = "ps"), 
+                      family = poisson, 
+                      method = "REML", 
+                      control = list(maxit =100000),
+                      data = X[[i]]
+  )
 }
 
 #uncertainty interval of RSV trajectory and onset timing
@@ -77,7 +88,7 @@ for (i in names(X)){
                                                  data.frame(wk = t), 
                                                  pspline.outbreak.cases, 
                                                  samples = 100)
-  }
+}
 
 #iterate for each country and year, compute first and second derivative
 for (i in names(X)){
@@ -103,30 +114,19 @@ for (i in names(X)){
     ungroup()
 }
 
-#compute mean, low and upper 95%CI for onset by country and year
-rsv_onset_us <-
-bind_rows(onset.samples, .id = "id") %>%
-  mutate(yr = str_sub(id, -4, -1),
-         country = word(id, 1, sep = "\\.")) %>%
-  select(everything(), -id) %>%
-  group_by(country, yr) %>%
-  summarise(epiwk = mean(onset, 0.025),
-            l_epiwk = quantile(onset, 0.025),
-            u_epiwk = quantile(onset, 0.975)) %>%
-  ungroup()
-
 #compute mean, low and upper 95%CI for onset by country and preCOVID-19 vs each year after COVID-19 year
-rsv_onset_us_cov <-
+rsv_onset_north <-
   bind_rows(onset.samples, .id = "id") %>%
-  mutate(yr = str_sub(id, -4, -1),
+  mutate(yr = str_sub(id, -7, -1),
          country = word(id, 1, sep = "\\.")) %>%
   select(everything(), -id) %>%
-  mutate(covper = if_else(yr <=2019, "preCOVID-19",
-                          if_else(yr == 2021, "2021/22",
-                                  if_else(yr == 2022, "2022/23",
-                                          if_else(yr == 2023, "2023/24",
-                                                  if_else(yr == 2024, "2024/25",
-                                                          if_else(yr == 2025, "2025/26", NA_character_))))))) %>%
+  mutate(covper = if_else(yr == "2017/18" | yr == "2018/19" | yr == "2019/20", "preCOVID-19",
+                          if_else(yr == "2021/22", "2021/22",
+                                  if_else(yr == "2022/23", "2022/23",
+                                          if_else(yr == "2023/24", "2023/24",
+                                                  if_else(yr == "2024/25", "2024/25",
+                                                          if_else(yr == "2025/26", "2025/26", NA_character_))))))) %>%
+  dplyr::filter(!is.na(covper)) %>%
   group_by(country, covper) %>%
   summarise(epiwk = mean(onset, 0.025),
             l_epiwk = quantile(onset, 0.025),

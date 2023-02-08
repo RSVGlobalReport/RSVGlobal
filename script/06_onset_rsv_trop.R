@@ -14,16 +14,29 @@
 #split the dataset by country each having country name, yr, wk (up to 52 weeks) and cases from 2017-2019
 #we restrict weeks to 52 (may also take mean cases of week 52 and 53 and assign to week 52)
 #, rsv_usa_nat %>% select(hemi:date, yr, mo, wk, cases)
-X <- rsv_all %>%
-  select(country, yr, wk, cases) %>%
+
+#drop country and rename within US regions as country to adapt the code below
+
+
+
+
+
+W <-
+  left_join(rsv_all, climate) %>%
+  filter(climate == "tropical") %>%
+  dplyr::select(country, yr, wk, cases) %>%
   group_by(country, yr) %>%
   mutate(tcases = sum(cases, na.rm = TRUE)) %>%
-  filter(wk <=52, yr != 2020, yr !=2023, tcases >99) %>% 
+  filter(wk <=52, yr != 2020, yr != 2023, tcases >90) %>% 
   select(country, yr, wk, cases) %>%
-  arrange(country, yr, wk, cases) %>%
+  arrange(country, yr, wk)
+
+#split the dataset by country/regionUS and year to form list of datasets
+X <- 
+  W %>%  
   split(list(.$country, .$yr))
 
-#delete empty country.yr dataframes from list X (they have less than threshold total cases [tcases] throughout the year)
+#delete empty country.yr data frames from list X (they have less than threshold total cases [tcases] throughout the year)
 X <- X[unlist(lapply(X, nrow) != 0)]
 
 #function to calculate derivative and assist derivative calculation
@@ -41,13 +54,13 @@ Gmodels <- list()
 set.seed = 1988
 
 #run the GAM models where smoothing parameter/knots are automatically selected via a cross validation method
-for (i in 1:length(X)) {
-Gmodels[[i]] <- gam(cases ~ s(x = wk, bs = "ps"), 
-                         family = poisson, 
-                         method = "REML", 
-                         control = list(maxit =100000),
-                         data = X[[i]]
-                         )
+for (i in names(X)) {
+  Gmodels[[i]] <- gam(cases ~ s(x = wk, bs = "ps"), 
+                      family = poisson, 
+                      method = "REML", 
+                      control = list(maxit =100000),
+                      data = X[[i]]
+  )
 }
 
 #uncertainty interval of RSV trajectory and onset timing
@@ -57,15 +70,15 @@ onset.samples <- list()
 
 #uns simulations on an outbreak GAM to estimate time series outbreak outcomes 
 #and returns estimated time series outcomes for each simulation.
-for (i in 1:length(X)){
+for (i in names(X)){
   cases.samples[[i]] = pspline.sample.timeseries(Gmodels[[i]], 
                                                  data.frame(wk = t), 
                                                  pspline.outbreak.cases, 
-                                                 samples = 30)
-  }
+                                                 samples = 100)
+}
 
 #iterate for each country and year, compute first and second derivative
-for (i in 1:length(X)){
+for (i in names(X)){
   onset.samples[[i]] = cases.samples[[i]] %>% 
     group_by(pspline.sample) %>% # for each sample do the following
     do((function(data){
@@ -88,30 +101,21 @@ for (i in 1:length(X)){
     ungroup()
 }
 
-#create an empty matrix to hold onset timing data
-rsv_onset <- matrix(data = NA, nrow = length(X), ncol = 4)
-colnames(rsv_onset) <- c("epiwk","l_epiwk","u_epiwk","ncountry")
-
-#update the matrix with estimated values and convert to data frame
-for (i in 1:length(X)){
-  rsv_onset[i,1] <- mean(onset.samples[[i]]$onset)
-  rsv_onset[i,2] <- quantile(onset.samples[[i]]$onset,0.025)
-  rsv_onset[i,3] <- quantile(onset.samples[[i]]$onset,0.975) 
-  rsv_onset[i,4] <- i}
-rsv_onset <- as.data.frame(rsv_onset)
-
-#extract country and yr from original dataset to merge with onset dataset
-rsv_onset <- 
-  rsv_onset %>%
-  left_join(
-    rsv_all %>%
-      select(hemi, region, country, yr, wk, cases) %>%
-      group_by(hemi, region, country, yr) %>%
-      mutate(tcases = sum(cases, na.rm = TRUE)) %>%
-      filter(wk <=52, yr != 2020, yr !=2023, tcases >99) %>% 
-      summarise(tot_cases = sum(cases)) %>%
-      ungroup() %>%
-      mutate(ncountry = 1:n()) %>%
-      select(ncountry, hemi, region, country, yr)
-)
-  
+#compute mean, low and upper 95%CI for onset by country and preCOVID-19 vs each year after COVID-19 year
+rsv_onset_trop <-
+  bind_rows(onset.samples, .id = "id") %>%
+  mutate(yr = str_sub(id, -4, -1),
+         country = word(id, 1, sep = "\\.")) %>%
+  select(everything(), -id) %>%
+  mutate(covper = if_else(yr == "2017" | yr == "2018" | yr == "2019", "preCOVID-19",
+                          if_else(yr == "2021", "2021",
+                                  if_else(yr == "2022", "2022",
+                                          if_else(yr == "2023", "2023",
+                                                  if_else(yr == "2024", "2024",
+                                                          if_else(yr == "2025", "2025", NA_character_))))))) %>%
+  dplyr::filter(!is.na(covper)) %>%
+  group_by(country, covper) %>%
+  summarise(epiwk = mean(onset, 0.025),
+            l_epiwk = quantile(onset, 0.025),
+            u_epiwk = quantile(onset, 0.975)) %>%
+  ungroup()
