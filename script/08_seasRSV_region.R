@@ -9,7 +9,7 @@
 
 #RSV cases time series
 reg_year <- 
-rsv_all %>%
+rsv_all %>% #(remember to filter for USA regions)
   dplyr::group_by(region, date, wk) %>%
   dplyr::summarise(cases = mean(cases, na.rm = TRUE)) %>%
   dplyr::ungroup() %>%

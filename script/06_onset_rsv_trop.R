@@ -11,23 +11,14 @@
 #====================================================================
 #====================================================================
 
-#split the dataset by country each having country name, yr, wk (up to 52 weeks) and cases from 2017-2019
-#we restrict weeks to 52 (may also take mean cases of week 52 and 53 and assign to week 52)
-#, rsv_usa_nat %>% select(hemi:date, yr, mo, wk, cases)
-
 #drop country and rename within US regions as country to adapt the code below
-
-
-
-
-
 W <-
   left_join(rsv_all, climate) %>%
-  filter(climate == "tropical") %>%
+  filter(wk_scale == "normal") %>%
   dplyr::select(country, yr, wk, cases) %>%
   group_by(country, yr) %>%
   mutate(tcases = sum(cases, na.rm = TRUE)) %>%
-  filter(wk <=52, yr != 2020, yr != 2023, tcases >90) %>% 
+  filter(wk <=52, yr != 2020, yr != 2023, tcases >99) %>% 
   select(country, yr, wk, cases) %>%
   arrange(country, yr, wk)
 

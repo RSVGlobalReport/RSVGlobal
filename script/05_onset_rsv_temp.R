@@ -18,7 +18,7 @@
 #drop country and rename within US regions as country to adapt the code below
 W <-
   left_join(rsv_all, climate) %>%
-  filter(climate == "temperate") %>%
+  filter(wk_scale == "inverted") %>%
   dplyr::select(country, yr, wk, cases) %>%
   dplyr::arrange(country, yr, wk) %>%
   dplyr::filter(wk <=52) %>%
@@ -40,7 +40,7 @@ W <-
   mutate(wk = seq.int(from = 24, by = 1, length.out = n()),
          tcases = sum(cases, na.rm = TRUE)) %>%
   dplyr::ungroup() %>%
-  dplyr::filter(yr != "2020/21",  tcases >199) %>% #filter out covid period
+  dplyr::filter(yr != "2020/21",  tcases >250) %>% #filter out covid period
   dplyr::select(country, yr, wk, cases)
 
 
@@ -115,7 +115,7 @@ for (i in names(X)){
 }
 
 #compute mean, low and upper 95%CI for onset by country and preCOVID-19 vs each year after COVID-19 year
-rsv_onset_north <-
+rsv_onset_temp <-
   bind_rows(onset.samples, .id = "id") %>%
   mutate(yr = str_sub(id, -7, -1),
          country = word(id, 1, sep = "\\.")) %>%
