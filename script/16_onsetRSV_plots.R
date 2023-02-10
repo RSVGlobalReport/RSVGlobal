@@ -172,14 +172,15 @@ for (i in c("Africa", "Americas", "Eastern Mediterranean", "Europe", "South East
 
 #there are 5 classifications of climatic zones according to Köppen-Geiger climate classification system
 #tropical, dry, temperate, continental, and polar
-#countries here are classified as such to check if climate zones align with onset of RSV cases
+#countries here are classified as tropical (tropical, dry), temperate (continental, polar), and subtropical (tropical, temperate) to check if climate zones align with onset of RSV cases
+#countries data can be found here (https://www.worlddata.info)
 
 #loop in the specified vector content
-for (i in c("Africa", "Americas", "Eastern Mediterranean", "Europe", "South East Asia", "Western Pacific")) {
+for (i in c("Tropical", "Temperate", "Sub-tropical")) {
   
-  rsv_onset_reg <-  
+  rsv_onset_cz <-  
     rsv_onset %>% 
-    filter(region == i, (country != "United States North East" & country != "United States South" & country != "United States West" & country != "United States Mid West")) %>%
+    filter(clim_zone == i, (country != "United States North East" & country != "United States South" & country != "United States West" & country != "United States Mid West")) %>%
     pivot_wider(names_from = covper, values_from = epiwk) %>%
     fill(precov, .direction = "up")
   
@@ -187,17 +188,17 @@ for (i in c("Africa", "Americas", "Eastern Mediterranean", "Europe", "South East
   scatterXY <-
     left_join(
       left_join(
-        rsv_onset_reg %>%
+        rsv_onset_cz %>%
           filter(is.na(y2021), is.na(y2022)) %>%
           select(country, precov, l_epiwk, u_epiwk) %>%
           rename("lwk1" = "l_epiwk", "uwk1" = "u_epiwk"),
         
-        rsv_onset_reg %>%
+        rsv_onset_cz %>%
           select(country, y2021, l_epiwk, u_epiwk) %>%
           filter(!is.na(y2021)) %>%
           rename("lwk2" = "l_epiwk", "uwk2" = "u_epiwk")),
       
-      rsv_onset_reg %>%
+      rsv_onset_cz %>%
         select(country, y2022, l_epiwk, u_epiwk) %>%
         filter(!is.na(y2022)) %>%
         rename("lwk3" = "l_epiwk", "uwk3" = "u_epiwk")
@@ -221,8 +222,8 @@ for (i in c("Africa", "Americas", "Eastern Mediterranean", "Europe", "South East
       labs(x = "PreCOVID-19 mean onset", y = "RSV onset in 2021", title = paste0("RSV onset in the ", i)) +
       theme(legend.position = "bottom", legend.title = element_blank()))
   
-  htmlwidgets::saveWidget(as_widget(plot1), here("output", "onset_each_region", file = paste0(i,"_region_preCovid_vs_2021_22.html")))
-  unlink(paste0(here("output", "onset_each_region", paste0(i,"_region_preCovid_vs_2021_22_files"))), recursive = TRUE) #delete metadata
+  htmlwidgets::saveWidget(as_widget(plot1), here("output", "onset_each_climatezone", file = paste0(i,"_climazone_preCovid_vs_2021_22.html")))
+  unlink(paste0(here("output", "onset_each_climatezone", paste0(i,"_climazone_preCovid_vs_2021_22_files"))), recursive = TRUE) #delete metadata
   
   
   plot2 = plotly::ggplotly(
@@ -239,8 +240,8 @@ for (i in c("Africa", "Americas", "Eastern Mediterranean", "Europe", "South East
       labs(x = "PreCOVID-19 mean onset", y = "RSV onset in 2022", title = paste0("RSV onset in the ", i)) +
       theme(legend.position = "bottom", legend.title = element_blank()))
   
-  htmlwidgets::saveWidget(as_widget(plot2), here("output", "onset_each_region", file = paste0(i,"_region_preCovid_vs_2022_23.html")))
-  unlink(paste0(here("output", "onset_each_region", paste0(i,"_region_preCovid_vs_2022_23_files"))), recursive = TRUE) #delete metadata
+  htmlwidgets::saveWidget(as_widget(plot2), here("output", "onset_each_climatezone", file = paste0(i,"_climazone_preCovid_vs_2022_23.html")))
+  unlink(paste0(here("output", "onset_each_climatezone", paste0(i,"_climazone_preCovid_vs_2022_23_files"))), recursive = TRUE) #delete metadata
   
 }
 
@@ -252,7 +253,7 @@ for (i in c("Africa", "Americas", "Eastern Mediterranean", "Europe", "South East
 #loop in the specified vector content
 for (i in c("United States")) {
   
-  rsv_onset_reg <-  
+  rsv_onset_us <-  
     rsv_onset %>% 
     filter(region == "Americas", (country == "United States" | country == "United States North East" | country == "United States South" | country == "United States West" | country == "United States Mid West")) %>%
     pivot_wider(names_from = covper, values_from = epiwk) %>%
@@ -262,17 +263,17 @@ for (i in c("United States")) {
   scatterXY <-
     left_join(
       left_join(
-        rsv_onset_reg %>%
+        rsv_onset_us %>%
           filter(is.na(y2021), is.na(y2022)) %>%
           select(country, precov, l_epiwk, u_epiwk) %>%
           rename("lwk1" = "l_epiwk", "uwk1" = "u_epiwk"),
         
-        rsv_onset_reg %>%
+        rsv_onset_us %>%
           select(country, y2021, l_epiwk, u_epiwk) %>%
           filter(!is.na(y2021)) %>%
           rename("lwk2" = "l_epiwk", "uwk2" = "u_epiwk")),
       
-      rsv_onset_reg %>%
+      rsv_onset_us %>%
         select(country, y2022, l_epiwk, u_epiwk) %>%
         filter(!is.na(y2022)) %>%
         rename("lwk3" = "l_epiwk", "uwk3" = "u_epiwk")
