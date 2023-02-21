@@ -21,8 +21,10 @@ for (i in c("Northern hemisphere", "Southern hemisphere")) {
   
   plot8 = plotly::ggplotly(
     hemi_year %>%
+      group_by(hemi) %>%
       mutate(newDate = max(date, na.rm = TRUE),
              newCases = cases[which.max(date == newDate)]) %>%
+      ungroup() %>%
       filter(hemi == i) %>%
       ggplot(aes(x = date, y = cases)) +
       geom_line() + 

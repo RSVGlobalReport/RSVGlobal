@@ -46,9 +46,9 @@ set.seed = 1988
 
 #run the GAM models where smoothing parameter/knots are automatically selected via a cross validation method
 for (i in names(X)) {
-  Gmodels[[i]] <- gam(cases ~ s(x = wk, bs = "ps"), 
-                      family = poisson, 
-                      method = "REML", 
+  Gmodels[[i]] <- gam(cases ~ s(x = wk, bs = "ps"),
+                      family = poisson,
+                      method = "REML",
                       control = list(maxit =100000),
                       data = X[[i]]
   )

@@ -16,7 +16,7 @@ country_year <-
   dplyr::mutate(cases = round(zoo::rollmean(cases, k = 3, fill = 0, align = 'right'))) %>%
   dplyr::ungroup()
 
-for (i in c("National", "Mid West", "West", "South", "North East")) {
+for (i in c("United States", "United States Mid West", "United States West", "United States South", "United States North East")) {
   plot31 = plotly::ggplotly(
     country_year %>%
       group_by(regionUS) %>%
@@ -33,8 +33,8 @@ for (i in c("National", "Mid West", "West", "South", "North East")) {
       labs(title = paste0("14-days rolling average RSV cases, 2017+ in ", i, " United States"), x = "Reporting date", y = "RSV cases")) %>%
     layout(hovermode = "x unified")
   
-  htmlwidgets::saveWidget(as_widget(plot31), here("output", "timeseries_each_country", file = paste0("timeseries_USA_", i,".html")))
-  unlink(paste0(here("output", "timeseries_each_country", paste0("timeseries_USA_",i,"_files"))), recursive = TRUE) #delete metadata
+  htmlwidgets::saveWidget(as_widget(plot31), here("output", "timeseries_each_country", file = paste0("timeseries_", i,".html")))
+  unlink(paste0(here("output", "timeseries_each_country", paste0("timeseries_",i,"_files"))), recursive = TRUE) #delete metadata
 }
 
 #====================================================================
@@ -64,7 +64,7 @@ rsv_all_p <-
                           TRUE ~ NA_character_))
 
 #weekly seasonal RSV dynamics for each year
-for (i in c("National", "Mid West", "West", "South", "North East")) {
+for (i in c("United States", "United States Mid West", "United States West", "United States South", "United States North East")) {
   plot32 = plotly::ggplotly(
     rsv_all_p %>%
       group_by(regionUS) %>%
@@ -88,8 +88,8 @@ for (i in c("National", "Mid West", "West", "South", "North East")) {
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
       theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")))
   
-  htmlwidgets::saveWidget(as_widget(plot32), here("output", "weekly_each_country", file = paste0("weekly_USA_", i,".html")))
-  unlink(paste0(here("output", "weekly_each_country", paste0("weekly_USA_",i,"_files"))), recursive = TRUE) #delete metadata
+  htmlwidgets::saveWidget(as_widget(plot32), here("output", "weekly_each_country", file = paste0("weekly_", i,".html")))
+  unlink(paste0(here("output", "weekly_each_country", paste0("weekly_",i,"_files"))), recursive = TRUE) #delete metadata
 }
 
 
@@ -130,7 +130,7 @@ rsv_all_q <-
   dplyr::ungroup()
 
 #weekly seasonal RSV dynamics for each year
-for (i in c("National", "Mid West", "West", "South", "North East")) {
+for (i in c("United States", "United States Mid West", "United States West", "United States South", "United States North East")) {
   plot33 = plotly::ggplotly(
     rsv_all_q %>%
       group_by(regionUS) %>%
@@ -154,7 +154,7 @@ for (i in c("National", "Mid West", "West", "South", "North East")) {
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
       theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")))
   
-  htmlwidgets::saveWidget(as_widget(plot33), here("output", "covidimpact_each_country", file = paste0("covidimpact_USA_", i,".html")))
-  unlink(paste0(here("output", "covidimpact_each_country", paste0("covidimpact_USA_",i,"_files"))), recursive = TRUE) #delete metadata
+  htmlwidgets::saveWidget(as_widget(plot33), here("output", "covidimpact_each_country", file = paste0("covidimpact_", i,".html")))
+  unlink(paste0(here("output", "covidimpact_each_country", paste0("covidimpact_",i,"_files"))), recursive = TRUE) #delete metadata
 }
 

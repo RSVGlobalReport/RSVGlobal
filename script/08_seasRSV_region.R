@@ -22,8 +22,10 @@ for (i in c("Africa", "Americas", "Eastern Mediterranean", "Europe", "South East
   
   plot2 = plotly::ggplotly(
     reg_year %>%
+      group_by(region) %>%
       mutate(newDate = max(date, na.rm = TRUE),
              newCases = cases[which.max(date == newDate)]) %>%
+        ungroup() %>%
       filter(region == i) %>%
       ggplot(aes(x = date, y = cases)) +
       geom_line() + 
