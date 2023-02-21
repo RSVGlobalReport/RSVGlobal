@@ -98,6 +98,7 @@ for (i in c("Argentina", "Belize", "Bolivia", "Brazil", "Canada", "Colombia", "C
       mutate(newDate = max(date, na.rm = TRUE),
              newWk = wk[which.max(date == newDate)],
              newCases = cases[which.max(date == newDate)]) %>%
+      ungroup() %>%
       
       ggplot(aes(x = wk, y = cases, color = covid)) +
       geom_line(size = 1) + 
