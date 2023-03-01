@@ -16,9 +16,19 @@ pacman::p_load(char = c("lubridate", "tidyverse", "dplyr", "here", "rio", "scale
 
 #====================================================================
 
+#set archiving path for downloaded datasets
+source("script/02_fileCache.R")
+source("script/03_runIfExpired.R")
 
+#load RSV dynamics datasets
+source("script/04_load_rsv_cases.R")
 
+#load RSV onset datasets and make onset plots
+source("script/05_load_rsv_onset.R")
+source("script/06_plot_rsv_onset.R")
 
-
-
+#run RSV dynamics datasets
+source("script/07_seasRSV_hemi.R")
+source("script/08_seasRSV_region.R")
+source("script/09_seasRSV_country.R")
 
