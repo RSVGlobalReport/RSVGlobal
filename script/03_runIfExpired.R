@@ -4,8 +4,6 @@
 
 #====================================================================
 
-
-
 # Using ExcessILI's data archiving functions, returns the most recent copy of
 # output obtained by running a function or formula \code{f}, unless this 
 # copy doesn't exist or is older (by modification time) than \code{maxage}.
