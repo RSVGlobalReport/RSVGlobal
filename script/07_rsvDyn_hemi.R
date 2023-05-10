@@ -9,7 +9,7 @@
 #time series of RSV cases
 hemi_ts <- 
   rsv_all %>%
-  filter(!(country %in% c("United States North East", "United States South", "United States West", "United States Mid West"))) %>% #(filter out USA regions)
+  dplyr::filter(!(country %in% c("United States North East", "United States South", "United States West", "United States Mid West"))) %>% #(filter out USA regions)
   dplyr::group_by(hemi, date, wk) %>%
   dplyr::summarise(cases = mean(cases, na.rm = TRUE)) %>%
   dplyr::ungroup() %>%

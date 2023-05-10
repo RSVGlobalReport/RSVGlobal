@@ -9,6 +9,7 @@
 #read the WHO RSV update file into R
 #source (https://www.who.int/teams/global-influenza-programme/surveillance-and-monitoring/influenza-surveillance-outputs)
 rsv <- runIfExpired('who_rsv', maxage = 168, ~read.csv(curl("https://frontdoor-l4uikgap6gz3m.azurefd.net/FLUMART/VIW_FNT?$format=csv")))
+#rsv <- rio::import(here("data", "alter_rsv", "VIW_FNT.csv")) #alternative way to input update rsv data if the link above is not working
 
 #set strings as factors to false globally
 base::options(stringsAsFactors = FALSE)
