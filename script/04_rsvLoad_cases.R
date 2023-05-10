@@ -1,6 +1,6 @@
 #Authors: Deus & Dan
 #Date: 01/03/2023
-#Title: Distinct global disruptions in respiratory syncytial virus seasonal timing following COVID-19 pandemic
+#Title: Rebound to normal RSV dynamics post COVID-19 suppression
 
 #====================================================================
 # WORLD HEALTH ORGANISATION DATA (VIA FLUNET)

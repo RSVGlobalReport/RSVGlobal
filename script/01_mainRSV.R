@@ -1,18 +1,23 @@
-#Deus & Dan
-#18/11/2022
-#global reemergence of RSV onset, duration and peak
+#Authors: Deus & Dan
+#Date: 01/03/2023
+#Title: Rebound to normal RSV dynamics post COVID-19 suppression
 
 #====================================================================
 
-#load package for installing and loading other packages
-#install.packages("pacman")
-#library(pacman)
+#load a package "pacman" used for for installing and loading other packages
+if(!require(pacman)) install.packages("pacman")
 
-#use packman to load packages for analysis
-pacman::p_load(char = c("lubridate", "tidyverse", "dplyr", "utils", "MLmetrics", "rio", "scales", "boot", "magrittr",  "mvtnorm", "zoo", "stringr",
-                        "patchwork", "PropCIs", "reshape2","purrr", "minqa", "ggridges", "timetk", "ggbreak", "ggpubr", "gridExtra", "readr",
-                        "curl", "archive", "jsonlite", "janitor", "ggh4x", "EpiEstim", "projections", "distcrete", "epitrix", "mgcv", "circular", 
-                        "pspline.inference", "incidence2", "RCurl", "XML", "rlist", "tsibble", "htmlwidgets", "plotly", "here"))
+#use pacman to load packages for analysis
+pacman::p_load(char = c("lubridate", "tidyverse", "dplyr", "tidyr", "broom", "rio", "scales", "boot", "magrittr",  "mvtnorm", "zoo", "stringr", "survminer",
+                        "patchwork", "PropCIs", "reshape2","purrr", "minqa", "ggridges", "timetk", "ggbreak", "ggpubr", "gridExtra", "readr", "survival",
+                        "curl", "archive", "jsonlite", "janitor", "ggh4x", "distcrete", "epitrix", "mgcv", "pspline.inference", "RCurl", "XML", "psych", "ie2misc", 
+                        "rlist", "tsibble", "htmlwidgets", "plotly", "utils", "MLmetrics", "circular", "gsignal", "moderndive", "knitr", "Smisc", "here"))
+
+#set seed for entire session to ensure reproducibility using a task call
+addTaskCallback(function(...) {set.seed(12345); TRUE})
+
+#turn off the task call for set seed if needed
+#removeTaskCallback(1)
 
 #====================================================================
 

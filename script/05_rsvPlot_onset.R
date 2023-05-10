@@ -1,16 +1,16 @@
-#Deus & Dan (code adapted from Gigi - https://github.com/Gigi112/RSV_tutorials/blob/main/2_RSV_timing_explain/RSV_timing_tutorial.Rmd)
-#18/11/2022
-#global reemergence of RSV onset, duration and peak
+#Authors: Deus & Dan
+#Date: 01/03/2023
+#Title: Rebound to normal RSV dynamics post COVID-19 suppression
 
 #====================================================================
 #====================================================================
 
 #merge the RSV onset datasets
 rsv_onset <-
-rows_append(rsv_onset_temp, rsv_onset_trop) %>% 
-  left_join(climate %>% select(country, clim_zone)) %>%
-  left_join(rsv_all %>% select(country, hemi, region) %>% distinct(.keep_all = TRUE)) %>%
-  mutate(covper = if_else(covper == "2021/22", "y2021",
+  dplyr::rows_append(rsv_onset_temp, rsv_onset_trop) %>% 
+  dplyr::left_join(climate %>% dplyr::select(country, clim_zone)) %>%
+  dplyr::left_join(rsv_all %>% dplyr::select(country, hemi, region) %>% distinct(.keep_all = TRUE)) %>%
+  dplyr::mutate(covper = if_else(covper == "2021/22", "y2021",
                           if_else(covper == "2022/23", "y2022",
                                   if_else(covper == "2021", "y2021",
                                           if_else(covper == "2022", "y2022",
@@ -31,24 +31,24 @@ rsv_onset_all <-
   
   #reshape the onset datasets for scatter plotting
   scatterXY <-
-    left_join(
-      left_join(
+    dplyr::left_join(
+      dplyr::left_join(
         rsv_onset_all %>%
-          filter(is.na(y2021), is.na(y2022)) %>%
-          select(country, precov, l_epiwk, u_epiwk) %>%
-          rename("lwk1" = "l_epiwk", "uwk1" = "u_epiwk"),
+          dplyr::filter(is.na(y2021), is.na(y2022)) %>%
+          dplyr::select(country, precov, l_epiwk, u_epiwk) %>%
+          dplyr::rename("lwk1" = "l_epiwk", "uwk1" = "u_epiwk"),
         
         rsv_onset_all %>%
-          select(country, y2021, l_epiwk, u_epiwk) %>%
-          filter(!is.na(y2021)) %>%
-          rename("lwk2" = "l_epiwk", "uwk2" = "u_epiwk")),
+          dplyr::select(country, y2021, l_epiwk, u_epiwk) %>%
+          dplyr::filter(!is.na(y2021)) %>%
+          dplyr::rename("lwk2" = "l_epiwk", "uwk2" = "u_epiwk")),
       
       rsv_onset_all %>%
-        select(country, y2022, l_epiwk, u_epiwk) %>%
-        filter(!is.na(y2022)) %>%
-        rename("lwk3" = "l_epiwk", "uwk3" = "u_epiwk"))  %>%
+        dplyr::select(country, y2022, l_epiwk, u_epiwk) %>%
+        dplyr::filter(!is.na(y2022)) %>%
+        dplyr::rename("lwk3" = "l_epiwk", "uwk3" = "u_epiwk"))  %>%
     
-    mutate(precovx = circular(precov, units = "degrees", template = "geographics", modulo = "2pi"),
+    dplyr::mutate(precovx = circular(precov, units = "degrees", template = "geographics", modulo = "2pi"),
            y2021x =  circular(y2021, units = "degrees", template = "geographics", modulo = "2pi"),
            y2022x = circular(y2022, units = "degrees", template = "geographics", modulo = "2pi")) %>% 
     
@@ -60,11 +60,11 @@ rsv_onset_all <-
   
   plot1 = plotly::ggplotly(
     scatterXY %>%
-      mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
+      dplyr::mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
       ggplot(aes(x = precov, y = y2021, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, shape = 4, stroke = 1, position = position_dodge(width = 0.5)) +
       geom_errorbar(aes(ymin = lwk2, ymax = uwk2), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-      geom_text(aes(x = 10, y = 50, label = paste0("r = ", corr2021, "%")), color = "black", size = 6, fontface = "bold") +
+      geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr2021, "%")), color = "black", size = 6, fontface = "bold") +
       geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
       scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
       scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -78,11 +78,11 @@ rsv_onset_all <-
   
   plot2 = plotly::ggplotly(
     scatterXY %>%
-      mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      dplyr::mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
       ggplot(aes(x = precov, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-      geom_text(aes(x = 10, y = 50, label = paste0("r = ", corr2022, "%")), color = "black", size = 6, fontface = "bold") +
+      geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr2022, "%")), color = "black", size = 6, fontface = "bold") +
       geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
       scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
       scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -96,11 +96,11 @@ rsv_onset_all <-
   
   plot3 = plotly::ggplotly(
     scatterXY %>%
-      mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      dplyr::mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
       ggplot(aes(x = y2021, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-      geom_text(aes(x = 10, y = 50, label = paste0("r = ", corr, "%")), color = "black", size = 6, fontface = "bold") +
+      geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr, "%")), color = "black", size = 6, fontface = "bold") +
       geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
       scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
       scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -122,31 +122,31 @@ for (i in c("Northern hemisphere", "Southern hemisphere")) {
   
   rsv_onset_hemi <-  
     rsv_onset %>% 
-    filter(hemi == i, (country != "United States North East" & country != "United States South" & country != "United States West" & country != "United States Mid West")) %>%
+    dplyr::filter(hemi == i, (country != "United States North East" & country != "United States South" & country != "United States West" & country != "United States Mid West")) %>%
     dplyr::mutate(row = row_number()) %>%
     pivot_wider(names_from = covper, values_from = epiwk) %>%
     dplyr::select(everything(), -row)
 
 #reshape the onset datasets for scatter plotting
 scatterXY <-
-  left_join(
-    left_join(
+  dplyr::left_join(
+    dplyr::left_join(
         rsv_onset_hemi %>%
-        filter(is.na(y2021), is.na(y2022)) %>%
-        select(country, precov, l_epiwk, u_epiwk) %>%
-        rename("lwk1" = "l_epiwk", "uwk1" = "u_epiwk"),
+          dplyr::filter(is.na(y2021), is.na(y2022)) %>%
+          dplyr::select(country, precov, l_epiwk, u_epiwk) %>%
+          dplyr::rename("lwk1" = "l_epiwk", "uwk1" = "u_epiwk"),
       
         rsv_onset_hemi %>%
-        select(country, y2021, l_epiwk, u_epiwk) %>%
-        filter(!is.na(y2021)) %>%
-        rename("lwk2" = "l_epiwk", "uwk2" = "u_epiwk")),
+          dplyr::select(country, y2021, l_epiwk, u_epiwk) %>%
+          dplyr::filter(!is.na(y2021)) %>%
+          dplyr::rename("lwk2" = "l_epiwk", "uwk2" = "u_epiwk")),
     
       rsv_onset_hemi %>%
-      select(country, y2022, l_epiwk, u_epiwk) %>%
-      filter(!is.na(y2022)) %>%
-      rename("lwk3" = "l_epiwk", "uwk3" = "u_epiwk"))  %>%
+      dplyr::select(country, y2022, l_epiwk, u_epiwk) %>%
+      dplyr::filter(!is.na(y2022)) %>%
+      dplyr::rename("lwk3" = "l_epiwk", "uwk3" = "u_epiwk"))  %>%
   
-  mutate(precovx = circular(precov, units = "degrees", template = "geographics", modulo = "2pi"),
+  dplyr::mutate(precovx = circular(precov, units = "degrees", template = "geographics", modulo = "2pi"),
          y2021x =  circular(y2021, units = "degrees", template = "geographics", modulo = "2pi"),
          y2022x = circular(y2022, units = "degrees", template = "geographics", modulo = "2pi")) %>% 
   
@@ -158,11 +158,11 @@ scatterXY <-
 
 plot1 = plotly::ggplotly(
   scatterXY %>%
-    mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
+    dplyr::mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
     ggplot(aes(x = precov, y = y2021, color = country), position = position_dodge(width = 0.5)) +
     geom_point(size = 4, shape = 4, stroke = 1, position = position_dodge(width = 0.5)) +
     geom_errorbar(aes(ymin = lwk2, ymax = uwk2), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-    geom_text(aes(x = 10, y = 50, label = paste0("r = ", corr2021, "%")), color = "black", size = 6, fontface = "bold") +
+    geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr2021, "%")), color = "black", size = 6, fontface = "bold") +
     geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
     scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
     scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -175,11 +175,11 @@ unlink(paste0(here("output", "onset_each_hemisphere", paste0(i,"_preCovid_vs_202
 
 plot2 = plotly::ggplotly(
   scatterXY %>%
-  mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+    dplyr::mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
   ggplot(aes(x = precov, y = y2022, color = country), position = position_dodge(width = 0.5)) +
   geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
   geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-  geom_text(aes(x = 10, y = 50, label = paste0("r = ", corr2022, "%")), color = "black", size = 6, fontface = "bold") +
+  geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr2022, "%")), color = "black", size = 6, fontface = "bold") +
   geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
   scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
   scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -192,11 +192,11 @@ unlink(paste0(here("output", "onset_each_hemisphere", paste0(i,"_preCovid_vs_202
 
 plot3 = plotly::ggplotly(
   scatterXY %>%
-    mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+    dplyr::mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
     ggplot(aes(x = y2021, y = y2022, color = country), position = position_dodge(width = 0.5)) +
     geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
     geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-    geom_text(aes(x = 10, y = 50, label = paste0("r = ", corr, "%")), color = "black", size = 6, fontface = "bold") +
+    geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr, "%")), color = "black", size = 6, fontface = "bold") +
     geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
     scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
     scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -219,31 +219,31 @@ for (i in c("Africa", "North Americas", "South Americas", "Eastern Mediterranean
   
   rsv_onset_reg <-  
     rsv_onset %>% 
-    filter(region == i, (country != "United States North East" & country != "United States South" & country != "United States West" & country != "United States Mid West")) %>%
+    dplyr::filter(region == i, (country != "United States North East" & country != "United States South" & country != "United States West" & country != "United States Mid West")) %>%
     dplyr::mutate(row = row_number()) %>%
     pivot_wider(names_from = covper, values_from = epiwk) %>%
     dplyr::select(everything(), -row)
   
   #reshape the onset datasets for scatter plotting
   scatterXY <-
-    left_join(
-      left_join(
+    dplyr::left_join(
+      dplyr::left_join(
         rsv_onset_reg %>%
-          filter(is.na(y2021), is.na(y2022)) %>%
-          select(country, precov, l_epiwk, u_epiwk) %>%
-          rename("lwk1" = "l_epiwk", "uwk1" = "u_epiwk"),
+          dplyr::filter(is.na(y2021), is.na(y2022)) %>%
+          dplyr::select(country, precov, l_epiwk, u_epiwk) %>%
+          dplyr::rename("lwk1" = "l_epiwk", "uwk1" = "u_epiwk"),
         
         rsv_onset_reg %>%
-          select(country, y2021, l_epiwk, u_epiwk) %>%
-          filter(!is.na(y2021)) %>%
-          rename("lwk2" = "l_epiwk", "uwk2" = "u_epiwk")),
+          dplyr::select(country, y2021, l_epiwk, u_epiwk) %>%
+          dplyr::filter(!is.na(y2021)) %>%
+          dplyr::rename("lwk2" = "l_epiwk", "uwk2" = "u_epiwk")),
       
       rsv_onset_reg %>%
-        select(country, y2022, l_epiwk, u_epiwk) %>%
-        filter(!is.na(y2022)) %>%
-        rename("lwk3" = "l_epiwk", "uwk3" = "u_epiwk")) %>%
+        dplyr::select(country, y2022, l_epiwk, u_epiwk) %>%
+        dplyr::filter(!is.na(y2022)) %>%
+        dplyr::rename("lwk3" = "l_epiwk", "uwk3" = "u_epiwk")) %>%
     
-    mutate(precovx = circular(precov, units = "degrees", template = "geographics", modulo = "2pi"),
+    dplyr::mutate(precovx = circular(precov, units = "degrees", template = "geographics", modulo = "2pi"),
            y2021x =  circular(y2021, units = "degrees", template = "geographics", modulo = "2pi"),
            y2022x = circular(y2022, units = "degrees", template = "geographics", modulo = "2pi")) %>% 
     
@@ -255,11 +255,11 @@ for (i in c("Africa", "North Americas", "South Americas", "Eastern Mediterranean
   
   plot1 = plotly::ggplotly(
     scatterXY %>%
-      mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
+      dplyr::mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
       ggplot(aes(x = precov, y = y2021, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, shape = 4, stroke = 1, position = position_dodge(width = 0.5)) +
       geom_errorbar(aes(ymin = lwk2, ymax = uwk2), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-      geom_text(aes(x = 10, y = 50, label = paste0("α = ", corr2021, "%")), color = "black", size = 6, fontface = "bold") +
+      geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr2021, "%")), color = "black", size = 6, fontface = "bold") +
       geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
       scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
       scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -272,11 +272,11 @@ for (i in c("Africa", "North Americas", "South Americas", "Eastern Mediterranean
   
   plot2 = plotly::ggplotly(
     scatterXY %>%
-      mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      dplyr::mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
       ggplot(aes(x = precov, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-      geom_text(aes(x = 10, y = 50, label = paste0("α = ", corr2022, "%")), color = "black", size = 6, fontface = "bold") +
+      geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr2022, "%")), color = "black", size = 6, fontface = "bold") +
       geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
       scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
       scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -289,11 +289,11 @@ for (i in c("Africa", "North Americas", "South Americas", "Eastern Mediterranean
   
   plot3 = plotly::ggplotly(
     scatterXY %>%
-      mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      dplyr::mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
       ggplot(aes(x = y2021, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-      geom_text(aes(x = 10, y = 50, label = paste0("r = ", corr, "%")), color = "black", size = 6, fontface = "bold") +
+      geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr, "%")), color = "black", size = 6, fontface = "bold") +
       geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
       scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
       scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -320,31 +320,31 @@ for (i in c("Tropical", "Temperate", "Sub-tropical")) {
   
   rsv_onset_cz <-  
     rsv_onset %>% 
-    filter(clim_zone == i, (country != "United States North East" & country != "United States South" & country != "United States West" & country != "United States Mid West")) %>%
+    dplyr::filter(clim_zone == i, (country != "United States North East" & country != "United States South" & country != "United States West" & country != "United States Mid West")) %>%
     dplyr::mutate(row = row_number()) %>%
     pivot_wider(names_from = covper, values_from = epiwk) %>%
     dplyr::select(everything(), -row)
 
   #reshape the onset datasets for scatter plotting
   scatterXY <-
-    left_join(
-      left_join(
+    dplyr::left_join(
+      dplyr::left_join(
         rsv_onset_cz %>%
-          filter(is.na(y2021), is.na(y2022)) %>%
-          select(country, precov, l_epiwk, u_epiwk) %>%
-          rename("lwk1" = "l_epiwk", "uwk1" = "u_epiwk"),
+          dplyr::filter(is.na(y2021), is.na(y2022)) %>%
+          dplyr::select(country, precov, l_epiwk, u_epiwk) %>%
+          dplyr::rename("lwk1" = "l_epiwk", "uwk1" = "u_epiwk"),
         
         rsv_onset_cz %>%
-          select(country, y2021, l_epiwk, u_epiwk) %>%
-          filter(!is.na(y2021)) %>%
-          rename("lwk2" = "l_epiwk", "uwk2" = "u_epiwk")),
+          dplyr::select(country, y2021, l_epiwk, u_epiwk) %>%
+          dplyr::filter(!is.na(y2021)) %>%
+          dplyr::rename("lwk2" = "l_epiwk", "uwk2" = "u_epiwk")),
       
       rsv_onset_cz %>%
-        select(country, y2022, l_epiwk, u_epiwk) %>%
-        filter(!is.na(y2022)) %>%
-        rename("lwk3" = "l_epiwk", "uwk3" = "u_epiwk"))  %>%
+        dplyr::select(country, y2022, l_epiwk, u_epiwk) %>%
+        dplyr::filter(!is.na(y2022)) %>%
+        dplyr::rename("lwk3" = "l_epiwk", "uwk3" = "u_epiwk"))  %>%
     
-    mutate(precovx = circular(precov, units = "degrees", template = "geographics", modulo = "2pi"),
+    dplyr::mutate(precovx = circular(precov, units = "degrees", template = "geographics", modulo = "2pi"),
            y2021x =  circular(y2021, units = "degrees", template = "geographics", modulo = "2pi"),
            y2022x = circular(y2022, units = "degrees", template = "geographics", modulo = "2pi")) %>% 
     
@@ -356,11 +356,11 @@ for (i in c("Tropical", "Temperate", "Sub-tropical")) {
   
   plot1 = plotly::ggplotly(
     scatterXY %>%
-      mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
+      dplyr::mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
       ggplot(aes(x = precov, y = y2021, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, shape = 4, stroke = 1, position = position_dodge(width = 0.5)) +
       geom_errorbar(aes(ymin = lwk2, ymax = uwk2), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-      geom_text(aes(x = 10, y = 50, label = paste0("α = ", corr2021, "%")), color = "black", size = 6, fontface = "bold") +
+      geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr2021, "%")), color = "black", size = 6, fontface = "bold") +
       geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
       scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
       scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -374,11 +374,11 @@ for (i in c("Tropical", "Temperate", "Sub-tropical")) {
   
   plot2 = plotly::ggplotly(
     scatterXY %>%
-      mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      dplyr::mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
       ggplot(aes(x = precov, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-      geom_text(aes(x = 10, y = 50, label = paste0("α = ", corr2022, "%")), color = "black", size = 6, fontface = "bold") +
+      geom_text(aes(x = 50, y = 10, label = paste0("α = ", corr2022, "%")), color = "black", size = 6, fontface = "bold") +
       geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
       scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
       scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -392,11 +392,11 @@ for (i in c("Tropical", "Temperate", "Sub-tropical")) {
   
   plot3 = plotly::ggplotly(
     scatterXY %>%
-      mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      dplyr::mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
       ggplot(aes(x = y2021, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-      geom_text(aes(x = 10, y = 50, label = paste0("r = ", corr, "%")), color = "black", size = 6, fontface = "bold") +
+      geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr, "%")), color = "black", size = 6, fontface = "bold") +
       geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
       scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
       scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -419,31 +419,31 @@ for (i in c("United States")) {
   
   rsv_onset_us <-  
     rsv_onset %>% 
-    filter(region == "North Americas", (country == "United States North East" | country == "United States South" | country == "United States West" | country == "United States Mid West")) %>%
+    dplyr::filter(region == "North Americas", (country == "United States North East" | country == "United States South" | country == "United States West" | country == "United States Mid West")) %>%
     dplyr::mutate(row = row_number()) %>%
     pivot_wider(names_from = covper, values_from = epiwk) %>%
     dplyr::select(everything(), -row)
     
   #reshape the onset datasets for scatter plotting
   scatterXY <-
-    left_join(
-      left_join(
+    dplyr::left_join(
+      dplyr::left_join(
         rsv_onset_us %>%
-          filter(is.na(y2021), is.na(y2022)) %>%
-          select(country, precov, l_epiwk, u_epiwk) %>%
-          rename("lwk1" = "l_epiwk", "uwk1" = "u_epiwk"),
+          dplyr::filter(is.na(y2021), is.na(y2022)) %>%
+          dplyr::select(country, precov, l_epiwk, u_epiwk) %>%
+          dplyr::rename("lwk1" = "l_epiwk", "uwk1" = "u_epiwk"),
         
         rsv_onset_us %>%
-          select(country, y2021, l_epiwk, u_epiwk) %>%
-          filter(!is.na(y2021)) %>%
-          rename("lwk2" = "l_epiwk", "uwk2" = "u_epiwk")),
+          dplyr::select(country, y2021, l_epiwk, u_epiwk) %>%
+          dplyr::filter(!is.na(y2021)) %>%
+          dplyr::rename("lwk2" = "l_epiwk", "uwk2" = "u_epiwk")),
       
       rsv_onset_us %>%
-        select(country, y2022, l_epiwk, u_epiwk) %>%
-        filter(!is.na(y2022)) %>%
-        rename("lwk3" = "l_epiwk", "uwk3" = "u_epiwk"))  %>%
+        dplyr::select(country, y2022, l_epiwk, u_epiwk) %>%
+        dplyr::filter(!is.na(y2022)) %>%
+        dplyr::rename("lwk3" = "l_epiwk", "uwk3" = "u_epiwk"))  %>%
     
-    mutate(precovx = circular(precov, units = "degrees", template = "geographics", modulo = "2pi"),
+    dplyr::mutate(precovx = circular(precov, units = "degrees", template = "geographics", modulo = "2pi"),
            y2021x =  circular(y2021, units = "degrees", template = "geographics", modulo = "2pi"),
            y2022x = circular(y2022, units = "degrees", template = "geographics", modulo = "2pi")) %>% 
     
@@ -455,11 +455,11 @@ for (i in c("United States")) {
   
   plot1 = plotly::ggplotly(
     scatterXY %>%
-      mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
+      dplyr::mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
       ggplot(aes(x = precov, y = y2021, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, shape = 4, stroke = 1, position = position_dodge(width = 0.5)) +
       geom_errorbar(aes(ymin = lwk2, ymax = uwk2), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-      geom_text(aes(x = 10, y = 50, label = paste0("α = ", corr2021, "%")), color = "black", size = 6, fontface = "bold") +
+      geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr2021, "%")), color = "black", size = 6, fontface = "bold") +
       geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
       scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
       scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -474,11 +474,11 @@ for (i in c("United States")) {
   
   plot2 = plotly::ggplotly(
     scatterXY %>%
-      mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      dplyr::mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
       ggplot(aes(x = precov, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-      geom_text(aes(x = 10, y = 50, label = paste0("α = ", corr2022, "%")), color = "black", size = 6, fontface = "bold") +
+      geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr2022, "%")), color = "black", size = 6, fontface = "bold") +
       geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
       scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
       scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
@@ -493,11 +493,11 @@ for (i in c("United States")) {
   
   plot3 = plotly::ggplotly(
     scatterXY %>%
-      mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      dplyr::mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
       ggplot(aes(x = y2021, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-      geom_text(aes(x = 10, y = 50, label = paste0("r = ", corr, "%")), color = "black", size = 6, fontface = "bold") +
+      geom_text(aes(x = 50, y = 10, label = paste0("r = ", corr, "%")), color = "black", size = 6, fontface = "bold") +
       geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
       scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
       scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +

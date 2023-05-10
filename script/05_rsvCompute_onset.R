@@ -1,6 +1,6 @@
 #Deus & Dan (code adapted from Gigi - https://github.com/Gigi112/RSV_tutorials/blob/main/2_RSV_timing_explain/RSV_timing_tutorial.Rmd)
-#18/11/2022
-#global reemergence of RSV onset, duration and peak
+#Date: 01/03/2023
+#Title: Rebound to normal RSV dynamics post COVID-19 suppression
 
 #disease onset calculations and intuition
 #When the first derivative is positive, the original curve is increasing. 

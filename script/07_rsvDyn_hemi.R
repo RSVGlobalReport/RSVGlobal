@@ -1,6 +1,6 @@
-#Deus & Dan
-#18/11/2022
-#global reemergence of RSV onset, duration and peak
+#Authors: Deus & Dan
+#Date: 01/03/2023
+#Title: Rebound to normal RSV dynamics post COVID-19 suppression
 
 #====================================================================
 #TIME SERIES RSV DYNAMICS BY HEMISPHERE
