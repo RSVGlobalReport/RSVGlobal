@@ -22,11 +22,11 @@ for (i in c("Northern hemisphere", "Southern hemisphere")) {
   
   plot1 = plotly::ggplotly(
     hemi_ts %>%
-      group_by(hemi) %>%
-      mutate(newDate = max(date, na.rm = TRUE),
+      dplyr::group_by(hemi) %>%
+      dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newCases = cases[which.max(date == newDate)]) %>%
-      ungroup() %>%
-      filter(hemi == i) %>%
+      dplyr::ungroup() %>%
+      dplyr::filter(hemi == i) %>%
       ggplot(aes(x = date, y = cases)) +
       geom_line() + 
       geom_point(aes(x = newDate, y = newCases), color = "red", size = 2.5) +
@@ -51,12 +51,12 @@ wkno = c(24:53, 1:23)
 
 hemi_wk <-
   rsv_all %>%
-  filter(!(country %in% c("United States North East", "United States South", "United States West", "United States Mid West"))) %>% #(filter out USA regions)
+  dplyr::filter(!(country %in% c("United States North East", "United States South", "United States West", "United States Mid West"))) %>% #(filter out USA regions)
   dplyr::group_by(hemi, yr, wk) %>%
   dplyr::mutate(cases = mean(cases, na.rm = TRUE)) %>%
   dplyr::ungroup() %>%
   dplyr::group_by(hemi, yr) %>% 
-  mutate(seas = case_when(hemi == "Northern hemisphere" & wk %in% wkno2 & yr == 2017 ~ "2017/18",
+  dplyr::mutate(seas = case_when(hemi == "Northern hemisphere" & wk %in% wkno2 & yr == 2017 ~ "2017/18",
                           hemi == "Northern hemisphere" & wk %in% wkno1 & yr == 2018 ~ "2017/18",
                           hemi == "Northern hemisphere" & wk %in% wkno2 & yr == 2018 ~ "2018/19",
                           hemi == "Northern hemisphere" & wk %in% wkno1 & yr == 2019 ~ "2018/19",
@@ -79,8 +79,8 @@ for (i in c("Southern hemisphere")) {
   plot2 = plotly::ggplotly(
     hemi_wk %>%
       dplyr::mutate(yr = as.factor(yr), cases = round(cases, digits = 0)) %>%
-      group_by(hemi) %>%
-      mutate(newDate = max(date, na.rm = TRUE),
+      dplyr::group_by(hemi) %>%
+      dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newWk = wk[which.max(date == newDate)],
              newCases = cases[which.max(date == newDate)]) %>%
       ungroup() %>%
@@ -106,11 +106,11 @@ for (i in c("Northern hemisphere")) {
   plot3 = plotly::ggplotly(
     hemi_wk %>%
       dplyr::mutate(yr = as.factor(yr), cases = round(cases, digits = 0), wk = factor(wk, levels(factor(wk))[c(wkno)])) %>%
-      group_by(hemi) %>%
-      mutate(newDate = max(date, na.rm = TRUE),
+      dplyr::group_by(hemi) %>%
+      dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newWk = wk[which.max(date == newDate)],
              newCases = cases[which.max(date == newDate)]) %>%
-      ungroup() %>%
+      dplyr::ungroup() %>%
       dplyr::filter(hemi == i, !is.na(seas)) %>% 
       
       ggplot(aes(x = wk, y = cases, group = seas, color = seas)) +
@@ -136,9 +136,9 @@ for (i in c("Northern hemisphere")) {
 #weekly seasonal RSV dynamics before/after COVID-19 by regions aggregated across years
 hemi_cv <-
   rsv_all %>%
-  filter(!(country %in% c("United States North East", "United States South", "United States West", "United States Mid West"))) %>% #(filter out USA regions)
+  dplyr::filter(!(country %in% c("United States North East", "United States South", "United States West", "United States Mid West"))) %>% #(filter out USA regions)
   dplyr::group_by(hemi, yr) %>% 
-  mutate(seas = case_when(hemi == "Northern hemisphere" & wk %in% wkno2 & yr == 2017 ~ "2017/18",
+  dplyr::mutate(seas = case_when(hemi == "Northern hemisphere" & wk %in% wkno2 & yr == 2017 ~ "2017/18",
                           hemi == "Northern hemisphere" & wk %in% wkno1 & yr == 2018 ~ "2017/18",
                           hemi == "Northern hemisphere" & wk %in% wkno2 & yr == 2018 ~ "2018/19",
                           hemi == "Northern hemisphere" & wk %in% wkno1 & yr == 2019 ~ "2018/19",
@@ -190,11 +190,11 @@ for (i in c("Southern hemisphere")) {
     hemi_cv1 %>%
       dplyr::mutate(period = as.factor(covidS), cases = round(mcases, digits = 0)) %>%
       dplyr::filter(hemi == i, !is.na(period)) %>% 
-      group_by(hemi) %>%
-      mutate(newDate = max(date, na.rm = TRUE),
+      dplyr::group_by(hemi) %>%
+      dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newWk = wk[which.max(date == newDate)],
              newCases = cases[which.max(date == newDate)]) %>%
-      ungroup() %>%
+      dplyr::ungroup() %>%
       
       ggplot(aes(x = wk, y = cases, color = period, group = period)) +
       geom_line(size = 1) +
@@ -217,11 +217,11 @@ for (i in c("Northern hemisphere")) {
     hemi_cv2 %>%
       dplyr::mutate(period = as.factor(covidN), cases = round(mcases, digits = 0), wk = factor(wk, levels(factor(wk))[c(wkno)])) %>%
       dplyr::filter(hemi == i, !is.na(period)) %>% 
-      group_by(hemi) %>%
-      mutate(newDate = max(date, na.rm = TRUE),
+      dplyr::group_by(hemi) %>%
+      dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newWk = wk[which.max(date == newDate)],
              newCases = cases[which.max(date == newDate)]) %>%
-      ungroup() %>%
+      dplyr::ungroup() %>%
       
       ggplot(aes(x = wk, y = cases, group = period, color = period)) +
       geom_line(size = 1) +

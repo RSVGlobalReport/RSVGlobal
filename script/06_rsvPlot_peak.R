@@ -200,7 +200,7 @@ unlink(paste0(here("output", "peak_each_hemisphere", paste0(i,"_2021_22_vs_2022_
 #====================================================================
 
 #loop in the specified vector content
-for (i in c("Africa", "North Americas", "South Americas", "Eastern Mediterranean", "Europe", "South East Asia", "Western Pacific")) {
+for (i in c("Africa", "North Americas", "South Americas", "Eastern Mediterranean", "Europe", "Western Pacific", "South East Asia")) {
   
   rsv_peak_reg <-  
     rsv_peak2 %>% 

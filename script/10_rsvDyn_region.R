@@ -9,7 +9,7 @@
 #RSV cases time series
 region_ts <- 
 rsv_all %>%
-  filter(!(country %in% c("United States North East", "United States South", "United States West", "United States Mid West"))) %>% #(filter out USA regions)
+  dplyr::filter(!(country %in% c("United States North East", "United States South", "United States West", "United States Mid West"))) %>% #(filter out USA regions)
   dplyr::group_by(region, date, wk) %>%
   dplyr::summarise(cases = mean(cases, na.rm = TRUE)) %>%
   dplyr::ungroup() %>%
@@ -22,11 +22,11 @@ for (i in c("Africa", "North Americas", "South Americas", "Eastern Mediterranean
   
   plot1 = plotly::ggplotly(
     region_ts %>%
-      group_by(region) %>%
-      mutate(newDate = max(date, na.rm = TRUE),
+      dplyr::group_by(region) %>%
+      dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newCases = cases[which.max(date == newDate)]) %>%
-        ungroup() %>%
-      filter(region == i) %>%
+      dplyr::ungroup() %>%
+      dplyr::filter(region == i) %>%
       ggplot(aes(x = date, y = cases)) +
       geom_line() + 
       geom_point(aes(x = newDate, y = newCases), color = "red", size = 2.5) +
@@ -55,7 +55,7 @@ region_wk <-
   dplyr::mutate(cases = mean(cases, na.rm = TRUE)) %>%
   dplyr::ungroup() %>%
   dplyr::group_by(region, yr) %>% 
-  mutate(seas = case_when((region == "Europe" | region == "Eastern Mediterranean" | region == "North Americas") & wk %in% wkno2 & yr == 2017 ~ "2017/18",
+  dplyr::mutate(seas = case_when((region == "Europe" | region == "Eastern Mediterranean" | region == "North Americas") & wk %in% wkno2 & yr == 2017 ~ "2017/18",
                           (region == "Europe" | region == "Eastern Mediterranean" | region == "North Americas") & wk %in% wkno1 & yr == 2018 ~ "2017/18",
                           (region == "Europe" | region == "Eastern Mediterranean" | region == "North Americas") & wk %in% wkno2 & yr == 2018 ~ "2018/19",
                           (region == "Europe" | region == "Eastern Mediterranean" | region == "North Americas") & wk %in% wkno1 & yr == 2019 ~ "2018/19",
@@ -78,11 +78,11 @@ for (i in c("Africa", "South Americas", "South East Asia", "Western Pacific")) {
   plot2 = plotly::ggplotly(
     region_wk %>%
       dplyr::mutate(yr = as.factor(yr), cases = round(cases, digits = 0)) %>%
-      group_by(region) %>%
-      mutate(newDate = max(date, na.rm = TRUE),
+      dplyr::group_by(region) %>%
+      dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newWk = wk[which.max(date == newDate)],
              newCases = cases[which.max(date == newDate)]) %>%
-      ungroup() %>%
+      dplyr::ungroup() %>%
       dplyr::filter(region == i) %>% 
       
       ggplot(aes(x = wk, y = cases, color = yr, group = yr)) +
@@ -105,11 +105,11 @@ for (i in c("North Americas", "Europe", "Eastern Mediterranean")) {
   plot3 = plotly::ggplotly(
     region_wk %>%
       dplyr::mutate(yr = as.factor(yr), cases = round(cases, digits = 0), wk = factor(wk, levels(factor(wk))[c(wkno)])) %>%
-      group_by(region) %>%
-      mutate(newDate = max(date, na.rm = TRUE),
+      dplyr::group_by(region) %>%
+      dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newWk = wk[which.max(date == newDate)],
              newCases = cases[which.max(date == newDate)]) %>%
-      ungroup() %>%
+      dplyr::ungroup() %>%
       dplyr::filter(region == i, !is.na(seas)) %>% 
       
       ggplot(aes(x = wk, y = cases, color = seas, group = seas)) +
@@ -136,7 +136,7 @@ for (i in c("North Americas", "Europe", "Eastern Mediterranean")) {
 region_cv <-
   rsv_all %>%
   dplyr::group_by(region, yr) %>% 
-  mutate(seas = case_when((region == "Europe" | region == "Eastern Mediterranean" | region == "North Americas") & wk %in% wkno2 & yr == 2017 ~ "2017/18",
+  dplyr::mutate(seas = case_when((region == "Europe" | region == "Eastern Mediterranean" | region == "North Americas") & wk %in% wkno2 & yr == 2017 ~ "2017/18",
                           (region == "Europe" | region == "Eastern Mediterranean" | region == "North Americas") & wk %in% wkno1 & yr == 2018 ~ "2017/18",
                           (region == "Europe" | region == "Eastern Mediterranean" | region == "North Americas") & wk %in% wkno2 & yr == 2018 ~ "2018/19",
                           (region == "Europe" | region == "Eastern Mediterranean" | region == "North Americas") & wk %in% wkno1 & yr == 2019 ~ "2018/19",
@@ -188,11 +188,11 @@ for (i in c("Africa", "South Americas", "South East Asia", "Western Pacific")) {
     region_cv1 %>%
       dplyr::mutate(period = as.factor(covidS), cases = round(mcases, digits = 0)) %>%
       dplyr::filter(region == i, !is.na(period)) %>% 
-      group_by(region) %>%
-      mutate(newDate = max(date, na.rm = TRUE),
+      dplyr::group_by(region) %>%
+      dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newWk = wk[which.max(date == newDate)],
              newCases = cases[which.max(date == newDate)]) %>%
-      ungroup() %>%
+      dplyr::ungroup() %>%
       
       ggplot(aes(x = wk, y = cases, color = period, group = period)) +
       geom_line(size = 1) +
@@ -215,11 +215,11 @@ for (i in c("North Americas", "Europe", "Eastern Mediterranean")) {
     region_cv2 %>%
       dplyr::mutate(period = as.factor(covidN), cases = round(mcases, digits = 0), wk = factor(wk, levels(factor(wk))[c(wkno)])) %>%
       dplyr::filter(region == i, !is.na(period)) %>% 
-      group_by(region) %>%
-      mutate(newDate = max(date, na.rm = TRUE),
+      dplyr::group_by(region) %>%
+      dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newWk = wk[which.max(date == newDate)],
              newCases = cases[which.max(date == newDate)]) %>%
-      ungroup() %>%
+      dplyr::ungroup() %>%
       
       ggplot(aes(x = wk, y = cases, color = period, group = period)) +
       geom_line(size = 1) +

@@ -17,8 +17,8 @@
 
 #drop country and rename within US regions as country to adapt the code below
 W <-
-  left_join(rsv_all, climate) %>%
-  filter(wk_scale == "inverted") %>%
+  dplyr::left_join(rsv_all, climate) %>%
+  dplyr::filter(wk_scale == "inverted") %>%
   dplyr::select(country, yr, wk, cases) %>%
   dplyr::arrange(country, yr, wk) %>%
   dplyr::filter(wk <=52) %>%
@@ -138,14 +138,15 @@ rsv_onset_temp <-
 
 #drop country and rename within US regions as country to adapt the code below
 W <-
-  left_join(rsv_all, climate) %>%
-  filter(wk_scale == "normal") %>%
+  dplyr::left_join(rsv_all, climate) %>%
+  dplyr::filter(wk_scale == "normal") %>%
   dplyr::select(country, yr, wk, cases) %>%
-  group_by(country, yr) %>%
-  mutate(tcases = sum(cases, na.rm = TRUE)) %>%
-  filter(wk <=52, yr != 2020, yr != 2023, tcases >99) %>% 
-  select(country, yr, wk, cases) %>%
-  arrange(country, yr, wk)
+  dplyr::group_by(country, yr) %>%
+  dplyr::mutate(tcases = sum(cases, na.rm = TRUE)) %>%
+  dplyr::ungroup() %>%
+  dplyr::filter(wk <=52, yr != 2020, yr != 2023, tcases >99) %>% 
+  dplyr::select(country, yr, wk, cases) %>%
+  dplyr::arrange(country, yr, wk)
 
 #split the dataset by country/regionUS and year to form list of datasets
 X <- 

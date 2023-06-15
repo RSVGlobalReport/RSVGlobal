@@ -25,8 +25,8 @@ for (i in c("Central African Republic", "Ivory Coast", "Madagascar", "South Afri
 
 plot1 = plotly::ggplotly(
   country_ts %>%
-    filter(country == i) %>%
-    mutate(newDate = max(date, na.rm = TRUE), 
+    dplyr::filter(country == i) %>%
+    dplyr::mutate(newDate = max(date, na.rm = TRUE), 
            newCases = cases[which.max(date == newDate)]) %>%
     
     ggplot(aes(x = date, y = cases)) +
@@ -49,14 +49,14 @@ unlink(paste0(here("output", "timeseries_each_country", paste0("timeseries_",i,"
 
 country_wk <- 
   rsv_all %>% 
-  left_join(climate %>% select(country, wk_scale)) %>%
-  filter(wk_scale == "normal")
+  dplyr::left_join(climate %>% select(country, wk_scale)) %>%
+  dplyr::filter(wk_scale == "normal")
 
 for (i in c("Argentina", "Australia", "Belize", "Bolivia", "Central African Republic", "Colombia", "Costa Rica", "Dominica", 
             "El Salvador", "India", "Ivory Coast", "Japan", "Malaysia", "Nicaragua", "Paraguay", "Peru", "South Africa", "Uruguay")) {
   plot2 = plotly::ggplotly(
     country_wk %>%
-      filter(country == i) %>%
+      dplyr::filter(country == i) %>%
       dplyr::mutate(yr = as.factor(yr), 
                     cases = round(cases, digits = 0),
                     newDate = max(date, na.rm = TRUE),
@@ -87,7 +87,7 @@ wkno = c(24:53, 1:23)
 country_wk <-
   rsv_all %>%
   dplyr::group_by(country, yr) %>% 
-  mutate(seas = case_when(wk %in% wkno2 & yr == 2017 ~ "2017/18",
+  dplyr::mutate(seas = case_when(wk %in% wkno2 & yr == 2017 ~ "2017/18",
                           wk %in% wkno1 & yr == 2018 ~ "2017/18",
                           wk %in% wkno2 & yr == 2018 ~ "2018/19",
                           wk %in% wkno1 & yr == 2019 ~ "2018/19",
@@ -112,8 +112,8 @@ for (i in c("Brazil", "Bulgaria", "Canada", "Denmark", "Ecuador", "England", "Fr
                     newDate = max(date, na.rm = TRUE),
                     newWk = wk[which.max(date == newDate)],
                     newCases = cases[which.max(date == newDate)]) %>%
-      ungroup() %>%
-      filter(!is.na(seas), country == i) %>%
+      dplyr::ungroup() %>%
+      dplyr::filter(!is.na(seas), country == i) %>%
       
       ggplot(aes(x = wk, y = cases,  group = seas, color = seas)) +
       geom_line(size = 1) +
@@ -148,15 +148,15 @@ for (i in c("Argentina", "Australia", "Belize", "Bolivia", "Central African Repu
                                                                     if_else(year(date) == 2024, "2024",
                                                                             if_else(year(date) == 2025, "2025",
                                                                                     if_else(year(date) == 2026, "2026", "2027"))))))))) %>%
-      filter(!is.na(covid), country == i) %>%
-      group_by(country, wk, covid) %>%
-      mutate(cases = round(mean(cases, rm.na = TRUE), digits = 0)) %>%
-      ungroup() %>%
-      group_by(country) %>%
-      mutate(newDate = max(date, na.rm = TRUE),
+      dplyr::filter(!is.na(covid), country == i) %>%
+      dplyr::group_by(country, wk, covid) %>%
+      dplyr::mutate(cases = round(mean(cases, rm.na = TRUE), digits = 0)) %>%
+      dplyr::ungroup() %>%
+      dplyr::group_by(country) %>%
+      dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newWk = wk[which.max(date == newDate)],
              newCases = cases[which.max(date == newDate)]) %>%
-      ungroup() %>%
+      dplyr::ungroup() %>%
       
       ggplot(aes(x = wk, y = cases, color = covid)) +
       geom_line(size = 1) + 
@@ -182,7 +182,7 @@ wkno = c(24:53, 1:23)
 country_cv <-
   rsv_all %>%
   dplyr::group_by(region, yr) %>% 
-  mutate(seas = case_when(wk %in% wkno2 & yr == 2017 ~ "2017/18",
+  dplyr::mutate(seas = case_when(wk %in% wkno2 & yr == 2017 ~ "2017/18",
                           wk %in% wkno1 & yr == 2018 ~ "2017/18",
                           wk %in% wkno2 & yr == 2018 ~ "2018/19",
                           wk %in% wkno1 & yr == 2019 ~ "2018/19",
@@ -208,15 +208,15 @@ for (i in c("Brazil", "Bulgaria", "Canada", "Denmark", "Ecuador", "England", "Fr
             "Mexico", "Mongolia", "Netherlands", "Northern Ireland", "Oman", "Panama", "Portugal", "Qatar",  "Scotland",  "Slovakia", "Spain", "Sweden", "United States")) {
   plot5 = plotly::ggplotly(
     country_cv %>%
-      group_by(country) %>%
+      dplyr::group_by(country) %>%
       dplyr::mutate(yr = as.factor(yr), 
                     wk = factor(wk, levels(factor(wk))[c(wkno)]),
                     cases = round(cases, digits = 0),
                     newDate = max(date, na.rm = TRUE),
                     newWk = wk[which.max(date == newDate)],
                     newCases = cases[which.max(date == newDate)]) %>%
-      ungroup() %>%
-      filter(!is.na(seas), country == i) %>%
+      dplyr::ungroup() %>%
+      dplyr::filter(!is.na(seas), country == i) %>%
       
       ggplot(aes(x = wk, y = cases, group = covid, color = covid)) +
       geom_line(size = 1) +
