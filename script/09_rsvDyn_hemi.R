@@ -24,12 +24,14 @@ for (i in c("Northern hemisphere", "Southern hemisphere")) {
     hemi_ts %>%
       dplyr::group_by(hemi) %>%
       dplyr::mutate(newDate = max(date, na.rm = TRUE),
-             newCases = cases[which.max(date == newDate)]) %>%
+             newCases = cases[which.max(date == newDate)],
+             recentDate = if_else(date > newDate-28, date, NA_Date_)) %>%
       dplyr::ungroup() %>%
       dplyr::filter(hemi == i) %>%
-      ggplot(aes(x = date, y = cases)) +
-      geom_line() + 
-      geom_point(aes(x = newDate, y = newCases), color = "red", size = 2.5) +
+      ggplot() +
+      geom_line(aes(x = date, y = cases), color = "black", size = 1) + 
+      geom_line(aes(x = recentDate, y = cases), color = "red", size = 1) + 
+      geom_point(aes(x = newDate, y = newCases), color = "red", size = 3.5) +
       scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
       theme_bw(base_size = 11, base_family = "Lato", base_line_size = 1.5) +
       labs(title = paste0("14-days rolling average RSV cases, 2017+ in ", i), x = "Reporting date", y = "RSV cases")) %>%
@@ -82,47 +84,51 @@ for (i in c("Southern hemisphere")) {
       dplyr::group_by(hemi) %>%
       dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newWk = wk[which.max(date == newDate)],
-             newCases = cases[which.max(date == newDate)]) %>%
+             newCases = cases[which.max(date == newDate)],
+             recentWks = if_else(yr == 2023 & wk >= newWk-4, wk, NA_integer_)) %>%
       ungroup() %>%
       dplyr::filter(hemi == i) %>% 
       
-      ggplot(aes(x = wk, y = cases, color = yr)) +
-      geom_line(size = 1) +
-      geom_point(aes(x = newWk, y = newCases, color = yr), size = 2.5) +
+      ggplot() +
+      geom_line(aes(x = wk, y = cases, color = yr), size = 1) +
+      geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
+      geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
       scale_colour_brewer(palette = 1, direction = 1) + 
-      labs(title = paste0("Mean weekly seasonal RSV cases in ", i), x = "Epi week", y = "RSV cases") +
-      guides(color = guide_legend(title = "")) +
+      labs(title = paste0("Mean weekly seasonal RSV cases in ", i), x = "Reporting week", y = "RSV cases") +
       scale_x_continuous(breaks = seq(1, 53, 4)) +
       theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
-      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-      theme(legend.position = "bottom", strip.background = element_rect(fill = "white")))
+      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)))
   
   htmlwidgets::saveWidget(as_widget(plot2), here("output", "weekly_each_hemisphere", file = paste0("weekly_", i,".html")))
   unlink(paste0(here("output", "weekly_each_hemisphere", paste0("weekly_",i,"_files"))), recursive = TRUE) #delete metadata
 }
 
 for (i in c("Northern hemisphere")) {
-  
+
   plot3 = plotly::ggplotly(
     hemi_wk %>%
-      dplyr::mutate(yr = as.factor(yr), cases = round(cases, digits = 0), wk = factor(wk, levels(factor(wk))[c(wkno)])) %>%
+      dplyr::mutate(yr = as.factor(yr), 
+                    cases = round(cases, digits = 0), 
+                    wk = factor(wk, levels(factor(wk))[c(wkno)])) %>%
+                    #wk2 = as.numeric(as.character(wk))) %>%
       dplyr::group_by(hemi) %>%
       dplyr::mutate(newDate = max(date, na.rm = TRUE),
-             newWk = wk[which.max(date == newDate)],
-             newCases = cases[which.max(date == newDate)]) %>%
+                    newWk = wk[which.max(date == newDate)],
+                    #newWk2 = as.numeric(as.character(newWk)), #convert to numeric bearing levels of factors
+                    newCases = cases[which.max(date == newDate)]) %>%
+                    #recentWks = as.factor(if_else(yr == 2023 & wk2 >= newWk2-4, wk, NA_character_))) %>%
       dplyr::ungroup() %>%
       dplyr::filter(hemi == i, !is.na(seas)) %>% 
       
-      ggplot(aes(x = wk, y = cases, group = seas, color = seas)) +
-      geom_line(size = 1) +
-      geom_point(aes(x = newWk, y = newCases, color = seas), size = 2.5) +
+      ggplot() +
+      geom_line(aes(x = wk, y = cases, group = seas, color = seas), size = 1) +
+      #geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
+      geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
       scale_colour_brewer(palette = 1, direction = 1) + 
-      labs(title = paste0("Mean weekly seasonal RSV cases in ", i), x = "Epi week", y = "RSV cases") +
-      guides(color = guide_legend(title = "")) +
+      labs(title = paste0("Mean weekly seasonal RSV cases in ", i), x = "Reporting week", y = "RSV cases") +
       scale_x_discrete(breaks = seq(1, 52, 4)) +
       theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
-      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-      theme(legend.position = "bottom", strip.background = element_rect(fill = "white")))
+      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)))
   
   htmlwidgets::saveWidget(as_widget(plot3), here("output", "weekly_each_hemisphere", file = paste0("weekly_", i,".html")))
   unlink(paste0(here("output", "weekly_each_hemisphere", paste0("weekly_",i,"_files"))), recursive = TRUE) #delete metadata
@@ -185,27 +191,27 @@ hemi_cv2 <-
   dplyr::ungroup()
 
 for (i in c("Southern hemisphere")) {
-  
+
   plot4 = plotly::ggplotly(
     hemi_cv1 %>%
       dplyr::mutate(period = as.factor(covidS), cases = round(mcases, digits = 0)) %>%
       dplyr::filter(hemi == i, !is.na(period)) %>% 
       dplyr::group_by(hemi) %>%
       dplyr::mutate(newDate = max(date, na.rm = TRUE),
-             newWk = wk[which.max(date == newDate)],
-             newCases = cases[which.max(date == newDate)]) %>%
+                    newWk = wk[which.max(date == newDate)],
+                    newCases = cases[which.max(date == newDate)],
+                    recentWks = if_else(yr == 2023 & wk >= newWk-4, wk, NA_integer_)) %>%
       dplyr::ungroup() %>%
       
-      ggplot(aes(x = wk, y = cases, color = period, group = period)) +
-      geom_line(size = 1) +
-      geom_point(aes(x = newWk, y = newCases, color = period), size = 2.5) +
+      ggplot() +
+      geom_line(aes(x = wk, y = cases, color = period, group = period), size = 1) +
+      geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
+      geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
       scale_colour_brewer(palette = 1, direction = 1) + 
       labs(title = paste0("Mean weekly seasonal RSV cases in ", i), x = "Epi week", y = "RSV cases") +
-      guides(color = guide_legend(title = "")) +
       scale_x_continuous(breaks = seq(1, 53, 4)) +
       theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
-      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-      theme(legend.position = "bottom", strip.background = element_rect(fill = "white")))
+      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)))
   
   htmlwidgets::saveWidget(as_widget(plot4), here("output", "covidimpact_each_hemisphere", file = paste0("covidimpact_", i,".html")))
   unlink(paste0(here("output", "covidimpact_each_hemisphere", paste0("covidimpact_",i,"_files"))), recursive = TRUE) #delete metadata
@@ -219,20 +225,18 @@ for (i in c("Northern hemisphere")) {
       dplyr::filter(hemi == i, !is.na(period)) %>% 
       dplyr::group_by(hemi) %>%
       dplyr::mutate(newDate = max(date, na.rm = TRUE),
-             newWk = wk[which.max(date == newDate)],
-             newCases = cases[which.max(date == newDate)]) %>%
+                    newWk = wk[which.max(date == newDate)],
+                    newCases = cases[which.max(date == newDate)]) %>%
       dplyr::ungroup() %>%
       
       ggplot(aes(x = wk, y = cases, group = period, color = period)) +
       geom_line(size = 1) +
-      geom_point(aes(x = newWk, y = newCases, color = period), size = 2.5) +
+      geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
       scale_colour_brewer(palette = 1, direction = 1) + 
       labs(title = paste0("Mean weekly seasonal RSV cases in ", i), x = "Epi week", y = "RSV cases") +
-      guides(color = guide_legend(title = "")) +
       scale_x_discrete(breaks = seq(1, 52, 4)) +
       theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
-      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-      theme(legend.position = "bottom", strip.background = element_rect(fill = "white")))
+      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)))
   
   htmlwidgets::saveWidget(as_widget(plot5), here("output", "covidimpact_each_hemisphere", file = paste0("covidimpact_", i,".html")))
   unlink(paste0(here("output", "covidimpact_each_hemisphere", paste0("covidimpact_",i,"_files"))), recursive = TRUE) #delete metadata

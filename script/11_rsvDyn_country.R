@@ -27,11 +27,13 @@ plot1 = plotly::ggplotly(
   country_ts %>%
     dplyr::filter(country == i) %>%
     dplyr::mutate(newDate = max(date, na.rm = TRUE), 
-           newCases = cases[which.max(date == newDate)]) %>%
+                  newCases = cases[which.max(date == newDate)],
+                  recentDate = if_else(date > newDate-28, date, NA_Date_)) %>%
     
-    ggplot(aes(x = date, y = cases)) +
-    geom_line() + 
-    geom_point(aes(x = newDate, y = newCases), color = "red", size = 2.5) +
+    ggplot() +
+    geom_line(aes(x = date, y = cases), size = 1) + 
+    geom_line(aes(x = recentDate, y = cases), color = "red", size = 1) + 
+    geom_point(aes(x = newDate, y = newCases), color = "red", size = 3.5) +
     scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
     theme_bw(base_size = 11, base_family = "Lato", base_line_size = 1.5) +
     labs(title = paste0("14-days rolling average RSV cases, 2017+ in ", i), x = "Reporting date", y = "RSV cases")) %>%
@@ -61,18 +63,18 @@ for (i in c("Argentina", "Australia", "Belize", "Bolivia", "Central African Repu
                     cases = round(cases, digits = 0),
                     newDate = max(date, na.rm = TRUE),
                     newWk = wk[which.max(date == newDate)],
-                    newCases = cases[which.max(date == newDate)]) %>%
+                    newCases = cases[which.max(date == newDate)],
+                    recentWks = if_else(yr == 2023 & wk >= newWk-4, wk, NA_integer_)) %>%
       
-      ggplot(aes(x = wk, y = cases, color = yr)) +
-      geom_line(size = 1) +
-      geom_point(aes(x = newWk, y = newCases, color = yr), size = 2) +
-      scale_colour_brewer(palette = 7, direction = 1) + 
+      ggplot() +
+      geom_line(aes(x = wk, y = cases, color = yr), size = 1) +
+      geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
+      geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
+      scale_colour_brewer(palette = 1, direction = 1) + 
       labs(title = paste0("Weekly seasonal RSV cases in ", i, " by year"), x = "Epi week", y = "RSV cases") +
-      guides(color = guide_legend(title = "")) +
       scale_x_continuous(breaks = seq(1, 53, 4)) +
       theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
-      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-      theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")))
+      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)))
   
   htmlwidgets::saveWidget(as_widget(plot2), here("output", "weekly_each_country", file = paste0("weekly_", i,".html")))
   unlink(paste0(here("output", "weekly_each_country", paste0("weekly_",i,"_files"))), recursive = TRUE) #delete metadata
@@ -99,6 +101,10 @@ country_wk <-
                           wk %in% wkno1 & yr == 2022 ~ "2021/22",
                           wk %in% wkno2 & yr == 2022 ~ "2022/23",
                           wk %in% wkno1 & yr == 2023 ~ "2022/23",
+                          wk %in% wkno2 & yr == 2023 ~ "2023/24",
+                          wk %in% wkno1 & yr == 2024 ~ "2023/24",
+                          wk %in% wkno2 & yr == 2024 ~ "2024/25",
+                          wk %in% wkno1 & yr == 2025 ~ "2024/25",
                           TRUE ~ NA_character_))
 
 for (i in c("Brazil", "Bulgaria", "Canada", "Denmark", "Ecuador", "England", "France", "Germany", "Guatemala", "Honduras", "Hungary", "Iceland", "Ireland", "Madagascar", 
@@ -115,16 +121,14 @@ for (i in c("Brazil", "Bulgaria", "Canada", "Denmark", "Ecuador", "England", "Fr
       dplyr::ungroup() %>%
       dplyr::filter(!is.na(seas), country == i) %>%
       
-      ggplot(aes(x = wk, y = cases,  group = seas, color = seas)) +
-      geom_line(size = 1) +
-      geom_point(aes(x = newWk, y = newCases, color = seas), size = 2) +
-      scale_colour_brewer(palette = 7, direction = 1) + 
+      ggplot() +
+      geom_line(aes(x = wk, y = cases,  group = seas, color = seas), size = 1) +
+      geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
+      scale_colour_brewer(palette = 1, direction = 1) + 
       labs(title = paste0("Weekly seasonal RSV cases in ", i, " by year"), x = "Epi week", y = "RSV cases") +
-      guides(color = guide_legend(title = "")) +
       scale_x_discrete(breaks = seq(1, 52, 4)) +
       theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
-      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-      theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")))
+      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)))
   
   htmlwidgets::saveWidget(as_widget(plot3), here("output", "weekly_each_country", file = paste0("weekly_", i,".html")))
   unlink(paste0(here("output", "weekly_each_country", paste0("weekly_",i,"_files"))), recursive = TRUE) #delete metadata
@@ -154,20 +158,20 @@ for (i in c("Argentina", "Australia", "Belize", "Bolivia", "Central African Repu
       dplyr::ungroup() %>%
       dplyr::group_by(country) %>%
       dplyr::mutate(newDate = max(date, na.rm = TRUE),
-             newWk = wk[which.max(date == newDate)],
-             newCases = cases[which.max(date == newDate)]) %>%
+                    newWk = wk[which.max(date == newDate)],
+                    newCases = cases[which.max(date == newDate)],
+                    recentWks = if_else(yr == 2023 & wk >= newWk-4, wk, NA_integer_)) %>%
       dplyr::ungroup() %>%
       
-      ggplot(aes(x = wk, y = cases, color = covid)) +
-      geom_line(size = 1) + 
-      geom_point(aes(x = newWk, y = newCases, color = covid), size = 2) +
-      scale_colour_brewer(palette = 7, direction = 1) + 
+      ggplot() +
+      geom_line(aes(x = wk, y = cases, color = covid), size = 1) + 
+      geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
+      geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
+      scale_colour_brewer(palette = 1, direction = 1) + 
       scale_x_continuous(breaks = seq(1, 53, 4)) +
       theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
       theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-      labs(title = paste0("(Mean) weekly seasonal RSV cases in ", i , " by year"), x = "Epi week", y = "RSV cases") +
-      theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")) +
-      guides(color = guide_legend(title = "")))
+      labs(title = paste0("(Mean) weekly seasonal RSV cases in ", i , " by year"), x = "Epi week", y = "RSV cases"))
   
   htmlwidgets::saveWidget(as_widget(plot4), here("output", "covidimpact_each_country", file = paste0("covidimpact_", i,".html")))
   unlink(paste0(here("output", "covidimpact_each_country", paste0("covidimpact_",i,"_files"))), recursive = TRUE) #delete metadata
@@ -218,16 +222,14 @@ for (i in c("Brazil", "Bulgaria", "Canada", "Denmark", "Ecuador", "England", "Fr
       dplyr::ungroup() %>%
       dplyr::filter(!is.na(seas), country == i) %>%
       
-      ggplot(aes(x = wk, y = cases, group = covid, color = covid)) +
-      geom_line(size = 1) +
-      geom_point(aes(x = newWk, y = newCases, color = covid), size = 2) +
-      scale_colour_brewer(palette = 7, direction = 1) + 
+      ggplot() +
+      geom_line(aes(x = wk, y = cases, group = covid, color = covid), size = 1) +
+      geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
+      scale_colour_brewer(palette = 1, direction = 1) + 
       labs(title = paste0("(Mean) weekly seasonal RSV cases in ", i, " by year"), x = "Epi week", y = "RSV cases") +
-      guides(color = guide_legend(title = "")) +
       scale_x_discrete(breaks = seq(1, 52, 4)) +
       theme_bw(base_size = 12, base_family = "Lato", base_line_size = 1) +
-      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)) +
-      theme(legend.position = "bottom", strip.background = element_rect(fill = "light yellow")))
+      theme(axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.3)))
   
   htmlwidgets::saveWidget(as_widget(plot5), here("output", "covidimpact_each_country", file = paste0("covidimpact_", i,".html")))
   unlink(paste0(here("output", "covidimpact_each_country", paste0("covidimpact_",i,"_files"))), recursive = TRUE) #delete metadata

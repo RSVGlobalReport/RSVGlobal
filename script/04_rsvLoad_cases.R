@@ -56,7 +56,7 @@ utils::str(rsvds)
 #filter to only have these countries included from Africa with somewhat case complete data from 2017
 rsv_afr <- 
   rsvds %>%
-  dplyr::filter(country %in% c("Central African Republic", "Côte d'Ivoire", "Madagascar", "South Africa"), year(date) >= 2017) %>%
+  dplyr::filter(country %in% c("Central African Republic", "Côte d'Ivoire", "Madagascar", "South Africa"), year(date) >= 2017) %>% # Cameroon, Uganda
   dplyr::mutate(country = if_else(country == "Côte d'Ivoire", "Ivory Coast", country))
 
 #'Not defined' may include sentinel or non-sentinel data
@@ -121,7 +121,7 @@ rsv_afr <-
 #filter to only have these countries included from South East Asia with somewhat case complete data from 2017
 rsv_sear <- 
   rsvds %>%
-  dplyr::filter(country %in% c("India"), year(date) >= 2017)
+  dplyr::filter(country %in% c("India"), year(date) >= 2017) #Timor-Leste, India, Thailand
 
 #'Not defined' may include sentinel or non-sentinel data
 #'properly index by week to have 0 or some observed number of cases in sequential weeks
@@ -185,7 +185,7 @@ rsv_sear <-
 #filter to only have these countries included from Western Pacific with somewhat case complete data from 2017
 rsv_wpr <- 
   rsvds %>%
-  dplyr::filter(country %in% c("Australia", "Japan", "Mongolia", "Malaysia"), year(date) >= 2017)
+  dplyr::filter(country %in% c("Australia", "Japan", "Mongolia", "Malaysia"), year(date) >= 2017) #China Hong Kong SAR, Australia, Japan, Mongolia, Malaysia, Republic of Korea
 
 #'Not defined' may include sentinel or non-sentinel data
 #'properly index by week to have 0 or some observed number of cases in sequential weeks
@@ -248,7 +248,7 @@ rsv_wpr <-
 #filter to only have these countries included from Eastern Mediterranean with somewhat case complete data from 2017
 rsv_emr <- 
   rsvds %>%
-  dplyr::filter(country %in% c("Oman", "Qatar"), year(date) >= 2017)
+  dplyr::filter(country %in% c("Oman", "Qatar"), year(date) >= 2017) #Qatar, Oman, United Arab Emirates, Kuwait
 
 #'Not defined' may include sentinel or non-sentinel data
 #'properly index by week to have 0 or some observed number of cases in sequential weeks
@@ -649,9 +649,18 @@ rsv_all %>%
                           if_else(country %in% c("Canada", "Mexico", "United States", "United States Mid West", "United States North East", 
                                                  "United States South", "United States West"), "North Americas", region)))
 
+# #set southern hemisphere countries to start from 1st week of 2017 to 52th week of 2022
+# south <- rsv_all %>% dplyr::filter(hemi == "Southern hemisphere" & date >= date("2017-01-08"))
+# 
+# #set northern hemisphere countries to start from 24th week of 2017 to 23rd week of 2023
+# north <- rsv_all %>% dplyr::filter(hemi == "Northern hemisphere" & date >= date("2017-06-11"))
+# 
+# #now combine the datasets
+# rsv_all <- bind_rows(south, north)
 
 #delete all temporary datasets
 rm(list = grep("rsv_all", ls(), value = TRUE, invert = TRUE))
+
 
 #====================================================================
 #CLIMATE RELATED DATA

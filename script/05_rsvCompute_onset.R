@@ -40,7 +40,7 @@ W <-
   mutate(wk = seq.int(from = 24, by = 1, length.out = n()),
          tcases = sum(cases, na.rm = TRUE)) %>%
   dplyr::ungroup() %>%
-  dplyr::filter(yr != "2020/21",  tcases >250) %>% #filter out covid period
+  dplyr::filter(yr != "2020/21", yr != "2023/24",  tcases >250) %>% #filter out covid period
   dplyr::select(country, yr, wk, cases)
 
 
