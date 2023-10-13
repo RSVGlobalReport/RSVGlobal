@@ -6,7 +6,7 @@
 #When the first derivative is positive, the original curve is increasing. 
 #In epidemic, this corresponds to the early stage of an outbreak as cases are increasing. 
 #When the second derivative reach its maximum in the segment that the first derivative is positive, it means that the growth rate of the increasing trend reach its maximum. 
-#This fits for the definition of the starting point of an disease outbreak.   
+#This fits for the definition of the starting point of a disease outbreak.   
 
 #====================================================================
 #====================================================================

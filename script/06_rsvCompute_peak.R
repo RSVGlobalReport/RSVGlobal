@@ -42,7 +42,7 @@ tsDS <- list()
 
 #iterate for each country, compute timing of the peak and the peak value
 for (i in names(X)){
-  peakDS[[i]] = data.frame(findpeaks(abs(Gmodels[[i]]$fitted.values), MinPeakHeight = 10, MinPeakDistance = 1, MinPeakWidth = 1, MaxPeakWidth = Inf, DoubleSided = FALSE))
+  peakDS[[i]] = data.frame(findpeaks(abs(Gmodels[[i]]$fitted.values), MinPeakHeight = 0.01, MinPeakDistance = 1, MinPeakWidth = 1, MaxPeakWidth = Inf, DoubleSided = FALSE))
 }
 
 rsv_peak1 <-
@@ -95,6 +95,7 @@ rsv_peak1 <-
 
 
 #====================================================================
+
 
 #summarise by precovid vs 2021/22 and 2022/23 seasons
 rsv_peak2 <-

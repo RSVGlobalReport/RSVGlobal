@@ -141,7 +141,7 @@ plot1 = plotly::ggplotly(
     ggplot(aes(x = precov, y = y2021, color = country), position = position_dodge(width = 0.5)) +
     geom_point(size = 4, shape = 4, stroke = 1, position = position_dodge(width = 0.5)) +
     #geom_errorbar(aes(ymin = lwk2, ymax = uwk2), width = 0, size = 1, position = position_dodge(width = 0.5)) +
-    geom_text(aes(x = 46, y = 8, label = paste0("C = ", corr2021)), color = "black", size = 6, fontface = "bold") +
+    geom_text(aes(x = 46, y = 8, label = paste0("c = ", corr2021)), color = "black", size = 6, fontface = "bold") +
     geom_abline(intercept = 0, slope = 1, color = "black", linetype = "dashed") +
     scale_x_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +
     scale_y_continuous(breaks = seq(0, 52, 4), limits = c(0,52)) +

@@ -30,17 +30,35 @@ source("script/03_runIfExpired.R")
 #load RSV dynamics datasets
 source("script/04_rsvLoad_cases.R")
 
-#compute RSV onset datasets
+#compute RSV onset
 source("script/05_rsvCompute_onset.R")
 
-#make RSV onset plots
-source("script/06_rsvPlot_onset.R")
+#plot RSV onset
+source("script/05_rsvPlot_onset.R")
+
+#compute RSV peak
+source("script/06_rsvCompute_peak.R")
+
+#plot RSV onset
+source("script/06_rsvPlot_peak.R")
+
+#compute RSV growth
+source("script/07_rsvCompute_growth.R")
+
+#plot RSV growth
+source("script/07_rsvPlot_growth.R")
+
+#compute RSV intensity
+source("script/08_rsvCompute_intensity.R")
+
+#plot RSV intensity
+source("script/08_rsvPlot_intensity.R")
 
 #run RSV dynamics by hemisphere
-source("script/07_rsvDyn_hemi.R")
+source("script/09_rsvDyn_hemi.R")
 
 #run RSV dynamics by region
-source("script/08_rsvDyn_region.R")
+source("script/10_rsvDyn_region.R")
 
 #run RSV dynamics by country
-source("script/09_rsvDyn_country.R")
+source("script/11_rsvDyn_country.R")

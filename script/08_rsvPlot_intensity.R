@@ -43,7 +43,7 @@ rsv_intens_all <-
   
   plot1 = plotly::ggplotly(
     scatterXY %>%
-      mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
+      mutate(precov = round(precov, digits = 2), y2021 = round(y2021, digits = 2)) %>%
       ggplot(aes(x = precov, y = y2021, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, shape = 4, stroke = 1, position = position_dodge(width = 0.5)) +
       #geom_errorbar(aes(ymin = lwk2, ymax = uwk2), width = 0, size = 1, position = position_dodge(width = 0.5)) +
@@ -59,7 +59,7 @@ rsv_intens_all <-
   
   plot2 = plotly::ggplotly(
     scatterXY %>%
-      mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      mutate(precov = round(precov, digits = 2), y2022 = round(y2022, digits = 2)) %>%
       ggplot(aes(x = precov, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       #geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
@@ -75,7 +75,7 @@ rsv_intens_all <-
   
   plot3 = plotly::ggplotly(
     scatterXY %>%
-      mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      mutate(y2021 = round(y2021, digits = 2), y2022 = round(y2022, digits = 2)) %>%
       ggplot(aes(x = y2021, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       #geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
@@ -133,7 +133,7 @@ scatterXY <-
 
 plot1 = plotly::ggplotly(
   scatterXY %>%
-    dplyr::mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
+    dplyr::mutate(precov = round(precov, digits = 2), y2021 = round(y2021, digits = 2)) %>%
     ggplot(aes(x = precov, y = y2021, color = country), position = position_dodge(width = 0.5)) +
     geom_point(size = 4, shape = 4, stroke = 1, position = position_dodge(width = 0.5)) +
     #geom_errorbar(aes(ymin = lwk2, ymax = uwk2), width = 0, size = 1, position = position_dodge(width = 0.5)) +
@@ -149,7 +149,7 @@ unlink(paste0(here("output", "intensity_each_hemisphere", paste0(i,"_preCovid_vs
 
 plot2 = plotly::ggplotly(
   scatterXY %>%
-    dplyr::mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+    dplyr::mutate(precov = round(precov, digits = 2), y2022 = round(y2022, digits = 2)) %>%
     ggplot(aes(x = precov, y = y2022, color = country), position = position_dodge(width = 0.5)) +
     geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
     #geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
@@ -165,7 +165,7 @@ unlink(paste0(here("output", "intensity_each_hemisphere", paste0(i,"_preCovid_vs
 
 plot3 = plotly::ggplotly(
   scatterXY %>%
-    dplyr::mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+    dplyr::mutate(y2021 = round(y2021, digits = 2), y2022 = round(y2022, digits = 2)) %>%
     ggplot(aes(x = y2021, y = y2022, color = country), position = position_dodge(width = 0.5)) +
     geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
     #geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
@@ -229,7 +229,7 @@ for (i in c("Tropical", "Temperate", "Sub-tropical")) {
   
   plot1 = plotly::ggplotly(
     scatterXY %>%
-      dplyr::mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
+      dplyr::mutate(precov = round(precov, digits = 2), y2021 = round(y2021, digits = 2)) %>%
       ggplot(aes(x = precov, y = y2021, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, shape = 4, stroke = 1, position = position_dodge(width = 0.5)) +
       #geom_errorbar(aes(ymin = lwk2, ymax = uwk2), width = 0, size = 1, position = position_dodge(width = 0.5)) +
@@ -246,7 +246,7 @@ for (i in c("Tropical", "Temperate", "Sub-tropical")) {
   
   plot2 = plotly::ggplotly(
     scatterXY %>%
-      dplyr::mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      dplyr::mutate(precov = round(precov, digits = 2), y2022 = round(y2022, digits = 2)) %>%
       ggplot(aes(x = precov, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       #geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
@@ -263,7 +263,7 @@ for (i in c("Tropical", "Temperate", "Sub-tropical")) {
   
   plot3 = plotly::ggplotly(
     scatterXY %>%
-      dplyr::mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      dplyr::mutate(y2021 = round(y2021, digits = 2), y2022 = round(y2022, digits = 2)) %>%
       ggplot(aes(x = y2021, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       #geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
@@ -322,7 +322,7 @@ for (i in c("United States")) {
   
   plot1 = plotly::ggplotly(
     scatterXY %>%
-      dplyr::mutate(precov = round(precov, digits = 1), y2021 = round(y2021, digits = 1)) %>%
+      dplyr::mutate(precov = round(precov, digits = 2), y2021 = round(y2021, digits = 2)) %>%
       ggplot(aes(x = precov, y = y2021, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, shape = 4, stroke = 1, position = position_dodge(width = 0.5)) +
       #geom_errorbar(aes(ymin = lwk2, ymax = uwk2), width = 0, size = 1, position = position_dodge(width = 0.5)) +
@@ -339,7 +339,7 @@ for (i in c("United States")) {
   
   plot2 = plotly::ggplotly(
     scatterXY %>%
-      dplyr::mutate(precov = round(precov, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      dplyr::mutate(precov = round(precov, digits = 2), y2022 = round(y2022, digits = 2)) %>%
       ggplot(aes(x = precov, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       #geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
@@ -356,7 +356,7 @@ for (i in c("United States")) {
   
   plot3 = plotly::ggplotly(
     scatterXY %>%
-      dplyr::mutate(y2021 = round(y2021, digits = 1), y2022 = round(y2022, digits = 1)) %>%
+      dplyr::mutate(y2021 = round(y2021, digits = 2), y2022 = round(y2022, digits = 2)) %>%
       ggplot(aes(x = y2021, y = y2022, color = country), position = position_dodge(width = 0.5)) +
       geom_point(size = 4, position = position_dodge(width = 0.5), shape = 4, stroke = 1) +
       #geom_errorbar(aes(ymin = lwk3, ymax = uwk3), width = 0, size = 1, position = position_dodge(width = 0.5)) +
