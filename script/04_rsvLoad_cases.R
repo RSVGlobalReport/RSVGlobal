@@ -56,8 +56,8 @@ utils::str(rsvds)
 #filter to only have these countries included from Africa with somewhat case complete data from 2017
 rsv_afr <- 
   rsvds %>%
-  dplyr::filter(country %in% c("Central African Republic", "Côte d'Ivoire", "Madagascar", "South Africa"), year(date) >= 2017) %>% # Cameroon, Uganda
-  dplyr::mutate(country = if_else(country == "Côte d'Ivoire", "Ivory Coast", country))
+  dplyr::filter(country %in% c("Central African Republic", "Côte d’Ivoire", "Madagascar", "South Africa"), year(date) >= 2017) %>% # Cameroon, Uganda
+  dplyr::mutate(country = if_else(country == "Côte d’Ivoire", "Ivory Coast", country)) 
 
 #'Not defined' may include sentinel or non-sentinel data
 #'properly index by week to have 0 or some observed number of cases in sequential weeks
@@ -466,82 +466,35 @@ rsv_who <-
 #====================================================================
 
 #read the CDC RSV update file/dataset into R, both case detection and testing (US regional data from 2021 onwards)
-#source (https://www.cdc.gov/surveillance/nrevss/rsv/region.html)
-rsv_usaNE <- runIfExpired('usa_rsv/rsv2021NE+', maxage = 168, ~XML::readHTMLTable(getURL("https://www.cdc.gov/surveillance/nrevss/images/trend_images/RSV14NumCent5AVG_Reg1.htm",.opts = list(ssl.verifypeer = FALSE)), header = TRUE))[["RSV Numerator Data for Census Region 1(5 week Average)"]]
-rsv_usaMW <- runIfExpired('usa_rsv/rsv2021MW+', maxage = 168, ~XML::readHTMLTable(getURL("https://www.cdc.gov/surveillance/nrevss/images/trend_images/RSV14NumCent5AVG_Reg2.htm",.opts = list(ssl.verifypeer = FALSE)), header = TRUE))[["RSV Numerator Data for Census Region 2(5 week Average)"]]
-rsv_usaSo <- runIfExpired('usa_rsv/rsv2021So+', maxage = 168, ~XML::readHTMLTable(getURL("https://www.cdc.gov/surveillance/nrevss/images/trend_images/RSV14NumCent5AVG_Reg3.htm",.opts = list(ssl.verifypeer = FALSE)), header = TRUE))[["RSV Numerator Data for Census Region 3(5 week Average)"]]
-rsv_usaWe <- runIfExpired('usa_rsv/rsv2021We+', maxage = 168, ~XML::readHTMLTable(getURL("https://www.cdc.gov/surveillance/nrevss/images/trend_images/RSV14NumCent5AVG_Reg4.htm",.opts = list(ssl.verifypeer = FALSE)), header = TRUE))[["RSV Numerator Data for Census Region 4(5 week Average)"]]
-rsv_usaFl <- runIfExpired('usa_rsv/rsv2021Fl+', maxage = 168, ~XML::readHTMLTable(getURL("https://www.cdc.gov/surveillance/nrevss/images/trend_images/RSV14NumCent5AVG_FL.htm",.opts = list(ssl.verifypeer = FALSE)), header = TRUE))[["RSV Data for Florida(5 week Average)"]]
-
-#data wrangling
-rsv_usa_reg1 <-
-  base::rbind(
-    
-    rsv_usaNE %>% 
-      dplyr::select(RepWeekDate, `PCR Detections`) %>% #we are reading Antigen test results only but its incorrectly labeled as PCR from source data
-      dplyr::rename("date" = "RepWeekDate", cases = `PCR Detections`) %>%
-      dplyr::mutate(regionUS = "United States North East"),
-  
-    rsv_usaMW %>% 
-      dplyr::select(RepWeekDate, `PCR Detections`) %>% #we are reading Antigen test results only but its incorrectly labeled as PCR from source data
-      dplyr::rename("date" = "RepWeekDate", cases = `PCR Detections`) %>%
-      dplyr::mutate(regionUS = "United States Mid West"),
-    
-    rsv_usaSo %>% 
-      dplyr::select(RepWeekDate, `PCR Detections`) %>% #we are reading Antigen test results only but its incorrectly labeled as PCR from source data
-      dplyr::rename("date" = "RepWeekDate", cases = `PCR Detections`) %>%
-      dplyr::mutate(regionUS = "United States South"),
-    
-    rsv_usaWe %>% 
-      dplyr::select(RepWeekDate, `PCR Detections`) %>% #we are reading Antigen test results only but its incorrectly labeled as PCR from source data
-      dplyr::rename("date" = "RepWeekDate", cases = `PCR Detections`) %>%
-      dplyr::mutate(regionUS = "United States West"),
-    
-    rsv_usaFl %>% 
-      dplyr::select(RepWeekDate, `PCR Detections`) %>% #we are reading Antigen test results only but its incorrectly labeled as PCR from source data
-      dplyr::rename("date" = "RepWeekDate", cases = `PCR Detections`) %>%
-      dplyr::mutate(regionUS = "United States South")) %>%
-  
-  dplyr::mutate(cases = as.integer(cases),
-                date = lubridate::mdy(date),
-                hemi = "Northern hemisphere",
-                region = "Americas",
-                country = "United States") %>%
-  dplyr::select(hemi, region, country, regionUS, date, cases)
-
-#view structure of data
-utils::str(rsv_usa_reg1)
-
-#expand the dataset to have single case per row
 rsv_usa_reg1 <- 
-  rsv_usa_reg1 %>% 
-  utils::type.convert(as.is = TRUE) %>% 
-  tidyr::uncount(cases)
+  rio::import('https://data.cdc.gov/resource/3cxc-4k8q.json?$limit=200000') %>%
+  dplyr::select(level, pcr_percent_positive, pcr_detections, pcr_tests, mmwrweek_end) %>%
+  dplyr::filter(level != "National") %>%
+  dplyr::rename("date" = "mmwrweek_end") %>%
+  dplyr::mutate(hemi = "Northern hemisphere",
+                region = "Americas",
+                country = "United States",
+                regionUS = if_else(level == "Region 1" | level == "Region 2", "United States North East", #collapse HHS regions into census regions
+                                   if_else(level == "Region 3" | level == "Region 4" | level == "Region 6", "United States South",
+                                           if_else(level == "Region 5" | level == "Region 7", "United States Mid West", "United States West"))),
+                cases = as.numeric(pcr_tests) * as.numeric(pcr_percent_positive)/100,
+                date = ymd(str_sub(date, 1, 10)),
+                cases = round(cases, digits = 0)) %>%
+  dplyr::filter(date >= date('2020-07-04')) %>%
+  dplyr::select(hemi, region, country, regionUS, date, cases) %>%
+  dplyr::group_by(hemi, region, country, regionUS, date) %>%
+  dplyr::summarise(cases = mean(cases)) %>%
+  dplyr::ungroup()
 
 #view structure of data
-utils::str(rsv_usa_reg1)
-
-#assign data types to variables
-rsv_usa_reg1 <-
-  rsv_usa_reg1 %>%
-  dplyr::mutate(hemi = factor(hemi),
-                region = factor(region),
-                country = country,
-                regionUS = regionUS,
-                date = lubridate::ymd(date))
-
-# view structure of data
 utils::str(rsv_usa_reg1)
 
 #====================================================================
 
 #read the CDC RSV update file/dataset into R (US regional data from 2020 backwards)
 #source (https://healthdata.gov/dataset/Respiratory-Syncytial-Virus-Laboratory-Data-NREVSS/7zgq-bp9w)
-rsv_usa_reg2 <- runIfExpired('usa_rsv/rsv2020-', maxage = 168, ~read.csv(curl("https://data.cdc.gov/api/views/52kb-ccu2/rows.csv?accessType=DOWNLOAD")))
-
-#get the required variables
-rsv_usa_reg2 <-
-  rsv_usa_reg2 %>%
+rsv_usa_reg2 <- 
+  runIfExpired('usa_rsv/rsv2020-', maxage = 168, ~read.csv(curl("https://data.cdc.gov/api/views/52kb-ccu2/rows.csv?accessType=DOWNLOAD"))) %>%
   dplyr::filter(!is.na(RSV.Detections)) %>%
   dplyr::select(Week.ending.Date, HHS.region, RSV.Detections) %>%
   dplyr::mutate(hemi = "Northern hemisphere",
@@ -553,52 +506,50 @@ rsv_usa_reg2 <-
                                            if_else(HHS.region == 5 | HHS.region == 7, "United States Mid West", "United States West")))) %>%
   dplyr::rename("date"= Week.ending.Date,
                 "cases" = RSV.Detections) %>%
-  dplyr::select(hemi, region, country, regionUS, date, cases)
+  dplyr::select(hemi, region, country, regionUS, date, cases) %>%
+  dplyr::group_by(hemi, region, country, regionUS, date) %>%
+  dplyr::summarise(cases = sum(cases)) %>%
+  dplyr::ungroup()
 
 #view structure of data
-utils::str(rsv_usa_reg2)
-
-#expand the dataset to have single case per row
-rsv_usa_reg2 <- 
-  rsv_usa_reg2 %>% 
-  utils::type.convert(as.is = TRUE) %>% 
-  tidyr:: uncount(cases)
-
-#view structure of data
-utils::str(rsv_usa_reg2)
-
-#assign data types to variables
-rsv_usa_reg2 <-
-  rsv_usa_reg2 %>%
-  dplyr::mutate(hemi = factor(hemi),
-                region = factor(region),
-                country = country,
-                regionUS = regionUS,
-                date = lubridate::ymd(date))
-
-# view structure of data
 utils::str(rsv_usa_reg2)
 
 #====================================================================
 
 #combine dataset from 2020 backwards (rsv_usa2) and 2021 onwards (rsv_usa1)
 rsv_usa_reg <-
-  dplyr::rows_append(
-    rsv_usa_reg1,
-    rsv_usa_reg2)
-base::rm(rsv_usa_reg1, rsv_usa_reg2)
+  dplyr::rows_append(rsv_usa_reg1, rsv_usa_reg2) %>%
+  dplyr::mutate(cases = round(cases, digits = 0))
+
+#expand
+rsv_usa_reg <-
+  rsv_usa_reg %>% 
+  utils::type.convert(as.is = TRUE) %>% 
+  tidyr:: uncount(cases)
+
+#assign data types
+rsv_usa_reg <-
+  rsv_usa_reg %>%
+  dplyr::mutate(hemi = factor(hemi),
+                region = factor(region),
+                country = country,
+                regionUS = regionUS,
+                date = lubridate::ymd(date))
+
+#view structure of data
+utils::str(rsv_usa_reg)
 
 #properly index by week to have 0 or some observed number of cases in sequential weeks
 rsv_usa_reg <- 
   rsv_usa_reg %>% 
   tidyr::drop_na(date) %>%
   dplyr::group_by(region, hemi, country, regionUS, date) %>%
-  dplyr::mutate(wkcases = floor_date(date, unit = "week")) %>% 
-  dplyr::count(wkcases) %>% 
+  dplyr::mutate(wkcases = floor_date(date, unit = "week")) %>%
+  dplyr::count(wkcases) %>%
   dplyr::ungroup() %>%
   dplyr::arrange(country, regionUS, date) %>%
-  tidyr::complete(wkcases = seq.Date(from = min(wkcases), to = max(wkcases), by = "week"), 
-                  nesting(region, hemi, country, regionUS), 
+  tidyr::complete(wkcases = seq.Date(from = min(wkcases), to = max(wkcases), by = "week"),
+                  nesting(region, hemi, country, regionUS),
                   fill = list(n = 0L)) %>%
   dplyr::select(hemi, region, country, regionUS, wkcases, n) %>%
   dplyr::rename("date" = "wkcases", "cases" = "n") %>%
@@ -661,6 +612,10 @@ rsv_all %>%
 #delete all temporary datasets
 rm(list = grep("rsv_all", ls(), value = TRUE, invert = TRUE))
 
+#filter to date you want
+rsv_all <-
+  rsv_all %>%
+  dplyr::filter(date(date) <= "2024-06-30")
 
 #====================================================================
 #CLIMATE RELATED DATA
@@ -669,4 +624,3 @@ rm(list = grep("rsv_all", ls(), value = TRUE, invert = TRUE))
 #import climate data that assign each country to temperate or tropical for easy weekly scaling
 climate <-
 import(here("data", "climate", "climate.csv"))
-

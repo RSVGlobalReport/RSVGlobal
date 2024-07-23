@@ -32,7 +32,7 @@ plot1 = plotly::ggplotly(
     
     ggplot() +
     geom_line(aes(x = date, y = cases), size = 1) + 
-    geom_line(aes(x = recentDate, y = cases), color = "red", size = 1) + 
+    #geom_line(aes(x = recentDate, y = cases), color = "red", size = 1) + 
     geom_point(aes(x = newDate, y = newCases), color = "red", size = 3.5) +
     scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
     theme_bw(base_size = 11, base_family = "Lato", base_line_size = 1.5) +
@@ -64,11 +64,11 @@ for (i in c("Argentina", "Australia", "Belize", "Bolivia", "Central African Repu
                     newDate = max(date, na.rm = TRUE),
                     newWk = wk[which.max(date == newDate)],
                     newCases = cases[which.max(date == newDate)],
-                    recentWks = if_else(yr == 2023 & wk >= newWk-4, wk, NA_integer_)) %>%
+                    recentWks = if_else(yr == 2024 & wk >= newWk-4, wk, NA_integer_)) %>% #change year as years go by
       
       ggplot() +
       geom_line(aes(x = wk, y = cases, color = yr), size = 1) +
-      geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
+      #geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
       geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
       scale_colour_brewer(palette = 1, direction = 1) + 
       labs(title = paste0("Weekly seasonal RSV cases in ", i, " by year"), x = "Epi week", y = "RSV cases") +
@@ -97,8 +97,8 @@ country_wk <-
                           wk %in% wkno1 & yr == 2020 ~ "2019/20",
                           wk %in% wkno2 & yr == 2020 ~ "2020/21",
                           wk %in% wkno1 & yr == 2021 ~ "2020/21",
-                          wk %in% wkno2 & yr == 2021 ~ "2021/22",
-                          wk %in% wkno1 & yr == 2022 ~ "2021/22",
+                          # wk %in% wkno2 & yr == 2021 ~ "2021/22",
+                          # wk %in% wkno1 & yr == 2022 ~ "2021/22",
                           wk %in% wkno2 & yr == 2022 ~ "2022/23",
                           wk %in% wkno1 & yr == 2023 ~ "2022/23",
                           wk %in% wkno2 & yr == 2023 ~ "2023/24",
@@ -136,7 +136,7 @@ for (i in c("Brazil", "Bulgaria", "Canada", "Denmark", "Ecuador", "England", "Fr
 
 
 #====================================================================
-#COVID-19 IMPACT ON RSV DYNAMICS BY EACH COUNTRY IN AFRICA
+#COVID-19 IMPACT ON RSV DYNAMICS BY EACH COUNTRY
 #====================================================================
 
 #weekly seasonal RSV dynamics for each year with typical calendar time (seasonality) before and after COVID-19 aggregated across preCOVID-19
@@ -146,12 +146,11 @@ for (i in c("Argentina", "Australia", "Belize", "Bolivia", "Central African Repu
     rsv_all %>%
       dplyr::mutate(covid = if_else(date < "2020-01-01", " PreCOVID (2017-19)", 
                                     if_else(year(date) == 2020, NA_character_, 
-                                            if_else(year(date) == 2021, "2021",
-                                                    if_else(year(date) == 2022, "2022",
+                                            # if_else(year(date) == 2021, "2021",
+                                            #         if_else(year(date) == 2022, "2022",
                                                             if_else(year(date) == 2023, "2023",
                                                                     if_else(year(date) == 2024, "2024",
-                                                                            if_else(year(date) == 2025, "2025",
-                                                                                    if_else(year(date) == 2026, "2026", "2027"))))))))) %>%
+                                                                            if_else(year(date) == 2025, "2025", NA_character_)))))) %>%
       dplyr::filter(!is.na(covid), country == i) %>%
       dplyr::group_by(country, wk, covid) %>%
       dplyr::mutate(cases = round(mean(cases, rm.na = TRUE), digits = 0)) %>%
@@ -160,12 +159,12 @@ for (i in c("Argentina", "Australia", "Belize", "Bolivia", "Central African Repu
       dplyr::mutate(newDate = max(date, na.rm = TRUE),
                     newWk = wk[which.max(date == newDate)],
                     newCases = cases[which.max(date == newDate)],
-                    recentWks = if_else(yr == 2023 & wk >= newWk-4, wk, NA_integer_)) %>%
+                    recentWks = if_else(yr == 2024 & wk >= newWk-4, wk, NA_integer_)) %>% #change year as years go by
       dplyr::ungroup() %>%
       
       ggplot() +
       geom_line(aes(x = wk, y = cases, color = covid), size = 1) + 
-      geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
+      #geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
       geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
       scale_colour_brewer(palette = 1, direction = 1) + 
       scale_x_continuous(breaks = seq(1, 53, 4)) +
@@ -198,11 +197,14 @@ country_cv <-
                           wk %in% wkno1 & yr == 2022 ~ "2021/22",
                           wk %in% wkno2 & yr == 2022 ~ "2022/23",
                           wk %in% wkno1 & yr == 2023 ~ "2022/23",
+                          wk %in% wkno2 & yr == 2023 ~ "2023/24",
+                          wk %in% wkno1 & yr == 2024 ~ "2023/24",
                           TRUE ~ NA_character_)) %>%
   
   dplyr::mutate(covid = if_else(seas == "2017/18" | seas == "2018/19" | seas == "2019/20", " PreCOVID (2017-19)",
-                                if_else(seas == "2021/22", "2021/22", 
-                                        if_else(seas == "2022/23", "2022/23", NA_character_)))) %>%
+                                # if_else(seas == "2021/22", "2021/22", 
+                                        if_else(seas == "2022/23", "2022/23", 
+                                                if_else(seas == "2023/24", "2023/24", NA_character_)))) %>%
   dplyr::filter(!is.na(covid)) %>%
   dplyr::group_by(country, wk, covid) %>%
   dplyr::mutate(cases = mean(cases, rm.na = TRUE)) %>%

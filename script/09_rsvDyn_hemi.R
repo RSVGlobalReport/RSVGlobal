@@ -30,7 +30,7 @@ for (i in c("Northern hemisphere", "Southern hemisphere")) {
       dplyr::filter(hemi == i) %>%
       ggplot() +
       geom_line(aes(x = date, y = cases), color = "black", size = 1) + 
-      geom_line(aes(x = recentDate, y = cases), color = "red", size = 1) + 
+      #geom_line(aes(x = recentDate, y = cases), color = "red", size = 1) + 
       geom_point(aes(x = newDate, y = newCases), color = "red", size = 3.5) +
       scale_x_date(date_labels = "%b %y", date_breaks = "1 year") +
       theme_bw(base_size = 11, base_family = "Lato", base_line_size = 1.5) +
@@ -66,8 +66,8 @@ hemi_wk <-
                           hemi == "Northern hemisphere" & wk %in% wkno1 & yr == 2020 ~ "2019/20",
                           hemi == "Northern hemisphere" & wk %in% wkno2 & yr == 2020 ~ "2020/21",
                           hemi == "Northern hemisphere" & wk %in% wkno1 & yr == 2021 ~ "2020/21",
-                          hemi == "Northern hemisphere" & wk %in% wkno2 & yr == 2021 ~ "2021/22",
-                          hemi == "Northern hemisphere" & wk %in% wkno1 & yr == 2022 ~ "2021/22",
+                          # hemi == "Northern hemisphere" & wk %in% wkno2 & yr == 2021 ~ "2021/22",
+                          # hemi == "Northern hemisphere" & wk %in% wkno1 & yr == 2022 ~ "2021/22",
                           hemi == "Northern hemisphere" & wk %in% wkno2 & yr == 2022 ~ "2022/23",
                           hemi == "Northern hemisphere" & wk %in% wkno1 & yr == 2023 ~ "2022/23",
                           hemi == "Northern hemisphere" & wk %in% wkno2 & yr == 2023 ~ "2023/24", 
@@ -85,13 +85,13 @@ for (i in c("Southern hemisphere")) {
       dplyr::mutate(newDate = max(date, na.rm = TRUE),
              newWk = wk[which.max(date == newDate)],
              newCases = cases[which.max(date == newDate)],
-             recentWks = if_else(yr == 2023 & wk >= newWk-4, wk, NA_integer_)) %>%
+             recentWks = if_else(yr == 2024 & wk >= newWk-4, wk, NA_integer_)) %>% #change year of recent weeks as year pass on
       ungroup() %>%
-      dplyr::filter(hemi == i) %>% 
+      dplyr::filter(hemi == i) %>%
       
       ggplot() +
-      geom_line(aes(x = wk, y = cases, color = yr), size = 1) +
-      geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
+      geom_line(aes(x = wk, y = cases, color = yr), size = 1) + #yr
+      #geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
       geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
       scale_colour_brewer(palette = 1, direction = 1) + 
       labs(title = paste0("Mean weekly seasonal RSV cases in ", i), x = "Reporting week", y = "RSV cases") +
@@ -107,7 +107,7 @@ for (i in c("Northern hemisphere")) {
 
   plot3 = plotly::ggplotly(
     hemi_wk %>%
-      dplyr::mutate(yr = as.factor(yr), 
+      dplyr::mutate(seas = as.factor(seas), 
                     cases = round(cases, digits = 0), 
                     wk = factor(wk, levels(factor(wk))[c(wkno)])) %>%
                     #wk2 = as.numeric(as.character(wk))) %>%
@@ -121,7 +121,7 @@ for (i in c("Northern hemisphere")) {
       dplyr::filter(hemi == i, !is.na(seas)) %>% 
       
       ggplot() +
-      geom_line(aes(x = wk, y = cases, group = seas, color = seas), size = 1) +
+      geom_line(aes(x = wk, y = cases, group = seas, color = seas), size = 1) + #seas
       #geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
       geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
       scale_colour_brewer(palette = 1, direction = 1) + 
@@ -163,17 +163,17 @@ hemi_cv <-
                           TRUE ~ NA_character_)) %>%
   
   dplyr::mutate(covidS = if_else(date < "2020-01-01", " PreCOVID (2017-19)", 
-                                 if_else(year(date) == 2021, "2021", 
-                                         if_else(year(date) == 2022, "2022",
+                                 # if_else(year(date) == 2021, "2021", 
+                                 #         if_else(year(date) == 2022, "2022",
                                                  if_else(year(date) == 2023, "2023", 
                                                          if_else(year(date) == 2024, "2024",
-                                                                 if_else(year(date) == 2025, "2025", NA_character_)))))),
+                                                                 if_else(year(date) == 2025, "2025", NA_character_)))),
                                          
                 covidN = if_else(seas == "2017/18" | seas == "2018/19" | seas == "2019/20", " PreCOVID (2017-19)",
-                                 if_else(seas == "2021/22", "2021/22", 
-                                         if_else(seas == "2022/23", "2022/23", 
+                                 # if_else(seas == "2021/22", "2021/22", 
+                                          if_else(seas == "2022/23", "2022/23", 
                                                  if_else(seas == "2023/24", "2023/24",
-                                                         if_else(seas == "2024/25", "2024/25", NA_character_)))))
+                                                         if_else(seas == "2024/25", "2024/25", NA_character_))))
   )
 
 hemi_cv1 <-
@@ -200,12 +200,12 @@ for (i in c("Southern hemisphere")) {
       dplyr::mutate(newDate = max(date, na.rm = TRUE),
                     newWk = wk[which.max(date == newDate)],
                     newCases = cases[which.max(date == newDate)],
-                    recentWks = if_else(yr == 2023 & wk >= newWk-4, wk, NA_integer_)) %>%
+                    recentWks = if_else(yr == 2024 & wk >= newWk-4, wk, NA_integer_)) %>% #change year of recent weeks as years pass on
       dplyr::ungroup() %>%
       
       ggplot() +
       geom_line(aes(x = wk, y = cases, color = period, group = period), size = 1) +
-      geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
+      #geom_line(aes(x = recentWks, y = cases), color = "red", size = 1) +
       geom_point(aes(x = newWk, y = newCases), color = "red", size = 3.5) +
       scale_colour_brewer(palette = 1, direction = 1) + 
       labs(title = paste0("Mean weekly seasonal RSV cases in ", i), x = "Epi week", y = "RSV cases") +
